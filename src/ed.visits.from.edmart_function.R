@@ -5,22 +5,17 @@
 #****************************
 
 
-library("labeling", lib="H:/R packages")
-library("digest", lib="H:/R packages")
-library("reshape2", lib="H:/R packages")
-library("magrittr", lib="H:/R packages")
-library("dplyr", lib="H:/R packages")
-# library("lazyeval", lib="H:/R packages")
-library("lubridate",  lib="H:/R packages")
-library("tidyr",  lib="H:/R packages")
-library("RODBC", lib="H:/R packages")
-library("proto", lib="H:/R packages")
-library("RSQLite", lib="H:/R packages")
-library("DBI", lib="H:/R packages")
-library("gsubfn", lib="H:/R packages")
-library("sqldf", lib="H:/R packages")
+library("reshape2")
+library("dplyr")
+library("RODBC")
+library("RSQLite")
+library("gsubfn")
+library("sqldf")
 
 # rm(list=ls())
+
+# todo: -----
+# include require() statements in the function
 
 
 cnx <- odbcConnect("nayef_cnxn")
