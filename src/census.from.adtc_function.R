@@ -1,6 +1,6 @@
 
 # Function specification: 
-
+# takes start and end date, returns daily census for relevant units. 
 
 
 # todo: ------
@@ -65,6 +65,6 @@ extractCensusData <- function(startdate, enddate, format='wide'){
 
 
 # test the function: ----------
-census2016 <- extractCensusData("2016-09-02", 
-                                "2016-09-06",
-                                format="wide")
+# census2016 <- extractCensusData("2016-09-02", 
+#                                 "2016-09-06",
+#                                 format="wide")
