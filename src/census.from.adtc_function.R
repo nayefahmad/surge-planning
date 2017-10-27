@@ -4,7 +4,6 @@
 
 
 # todo: ------
-# require: sqldf
 
 
 extractCensusData <- function(startdate, enddate, format='wide'){
