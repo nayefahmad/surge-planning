@@ -20,7 +20,7 @@ library("sqldf")
 
 cnx <- odbcConnect("nayef_cnxn")
 
-extractED_data <- function(startdate, enddate, ctas=TRUE, edArea=FALSE){
+extractED_data <- function(startdate, enddate, ctas=FALSE, edArea=FALSE){
       # EDMart query: 
       query1 <- paste0("SELECT StartDate, FacilityLongName, TriageAcuityDescription, [TriageAcuityCode], FirstEmergencyAreaDescription, COUNT(*) AS num_cases FROM [EDMart].[dbo].[vwEDVisitIdentifiedRegional] WHERE FacilityID = '112' AND StartDate BETWEEN ", "'", startdate, "' AND '", enddate, "' GROUP BY [TriageAcuityCode], StartDate, FacilityLongName, TriageAcuityDescription, FirstEmergencyAreaDescription ORDER BY StartDate,[TriageAcuityCode], FirstEmergencyAreaDescription, FacilityLongName")
      
@@ -34,7 +34,11 @@ extractED_data <- function(startdate, enddate, ctas=TRUE, edArea=FALSE){
             # USING SQLDF::sqldf TO RUN SQL COMMANDS ON DATA: 
             edData2 <- sqldf("SELECT StartDate, FacilityLongName, SUM(num_cases) as num_cases FROM edData GROUP BY StartDate, FacilityLongName ORDER BY StartDate")
             
-            return(edData2)
+            ed.data.m <- melt(edData2, 
+                              id.vars=c("FacilityLongName", "StartDate"))
+            ed.data.w <- dcast(ed.data.m, FacilityLongName~StartDate) #%>% print
+            
+            return(ed.data.w)
             
       } else if (ctas==TRUE && edArea==FALSE) {
             edData3 <- sqldf("SELECT StartDate, FacilityLongName, TriageAcuityDescription, [TriageAcuityCode], SUM(num_cases) as num_cases FROM edData GROUP BY StartDate, FacilityLongName, TriageAcuityDescription, [TriageAcuityCode] ORDER BY StartDate, TriageAcuityDescription, [TriageAcuityCode]")
