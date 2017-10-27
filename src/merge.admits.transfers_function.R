@@ -1,4 +1,9 @@
 
+
+#*************************************
+# FUNCTION TO MERGE ADMITS AND TRANSFERS FOR SPECIFIED DATES 
+#*************************************
+
 # rm(list=ls())
 
 
@@ -11,8 +16,6 @@ merge.admits.transf <- function(admits_data,
       # input: df with admits over a time range and another df with transfers
       # output: df with merge on date
       
-      # admits.data <- admits.data %>% print 
-      
       # ensure required packages are loaded: 
       stopifnot(c(require("RODBC"), 
                   require("sqldf"), 
@@ -20,7 +23,7 @@ merge.admits.transf <- function(admits_data,
                   require("reshape2"), 
                   require("lubridate")))
             
-      dates <- seq(ymd(startdate), ymd(enddate), by="day") %>% print 
+      dates <- seq(ymd(startdate), ymd(enddate), by="day") # %>% print 
       units <- c("EIP", "2E", "4E", "4W", "5E", "6E",
                  "6W", "7E", "ICU", "MIU", "7W", "Carlile Youth CD Ctr - IP")
       admits_data <- mutate(admits_data, 
@@ -30,9 +33,9 @@ merge.admits.transf <- function(admits_data,
                                unit =rep(units, length(dates))) # %>% print 
       
       
-      left_and_admits <- sqldf("SELECT date, unit, AdjustedAdmissionDate, AdmissionNursingUnitCode, num_cases FROM left_table LEFT JOIN admits_data ON (date=AdjustedAdmissionDate and unit=AdmissionNursingUnitCode)") %>% print 
+      left_and_admits <- sqldf("SELECT date, unit, AdjustedAdmissionDate, AdmissionNursingUnitCode, num_cases FROM left_table LEFT JOIN admits_data ON (date=AdjustedAdmissionDate and unit=AdmissionNursingUnitCode)") # %>% print 
       
-      admits_and_transfers <- sqldf("SELECT date, unit, AdjustedAdmissionDate, AdmissionNursingUnitCode, l.num_cases as admits, ToNursingUnitCode, t.num_cases as transfers FROM left_and_admits l LEFT JOIN transfer_data t ON (date=TransferDate AND unit=ToNursingUnitCode)") %>% print 
+      admits_and_transfers <- sqldf("SELECT date, unit, AdjustedAdmissionDate, AdmissionNursingUnitCode, l.num_cases as admits, ToNursingUnitCode, t.num_cases as transfers FROM left_and_admits l LEFT JOIN transfer_data t ON (date=TransferDate AND unit=ToNursingUnitCode)") # %>% print 
       
       
       admits_and_transfers <- 
@@ -43,7 +46,7 @@ merge.admits.transf <- function(admits_data,
                                     function(x){if (is.na(x)== TRUE){0} else {x}}),             
                    admits_and_transf=admits+transfers ) %>%
             
-            select(date, unit, admits, transfers, admits_and_transf)  %>% print
+            select(date, unit, admits, transfers, admits_and_transf)  # %>% print
       
       
       final_admits_and_transfers <- 
@@ -58,14 +61,14 @@ merge.admits.transf <- function(admits_data,
 
 #*********************************************
 # test the function: ------------
-source("admits.from.adtc_function.R")
-source("transfers.from.adtc_function.R")
-
-admits <- extractAdmissions("2016-10-07",
-                            "2016-10-11")
-transfers <- transferData("2016-10-07", 
-                          "2016-10-11")
-             
-merged <- merge.admits.transf(admits, transfers, 
-                              "2016-10-07", 
-                              "2016-10-11") %>% print 
+# source("admits.from.adtc_function.R")
+# source("transfers.from.adtc_function.R")
+# 
+# admits <- extractAdmissions("2016-10-07",
+#                             "2016-10-11")
+# transfers <- transferData("2016-10-07", 
+#                           "2016-10-11")
+#              
+# merged <- merge.admits.transf(admits, transfers, 
+#                               "2016-10-07", 
+#                               "2016-10-11") %>% print 
