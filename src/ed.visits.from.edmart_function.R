@@ -18,7 +18,7 @@ library("sqldf")
 # include require() statements in the function
 
 
-cnx <- odbcConnect("nayef_cnxn")
+cnx <- odbcConnect("cnx_SPDBSCSTA001")
 
 extractED_data <- function(startdate, enddate, ctas=FALSE, edArea=FALSE){
       # EDMart query: 
@@ -52,3 +52,5 @@ extractED_data <- function(startdate, enddate, ctas=FALSE, edArea=FALSE){
 }
 
 
+# test the function: 
+# extractED_data("2017-01-01", "2017-01-05")
