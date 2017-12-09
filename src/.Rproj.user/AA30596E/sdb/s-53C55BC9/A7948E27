@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "\n\n#****************************\n# Functions to extract ED Data\n#****************************\n\n\nlibrary(\"reshape2\")\nlibrary(\"dplyr\")\nlibrary(\"RODBC\")\nlibrary(\"RSQLite\")\nlibrary(\"gsubfn\")\nlibrary(\"sqldf\")\n\n# rm(list=ls())\n\n# todo: -----\n# include require() statements in the function\n\n\ncnx <- odbcConnect(\"cnx_SPDBSCSTA001\")\n\nextractED_data <- function(startdate, enddate, ctas=FALSE, edArea=FALSE){\n      # EDMart query: \n      query1 <- paste0(\"SELECT StartDate, FacilityLongName, TriageAcuityDescription, [TriageAcuityCode], FirstEmergencyAreaDescription, COUNT(*) AS num_cases FROM [EDMart].[dbo].[vwEDVisitIdentifiedRegional] WHERE FacilityID = '112' AND StartDate BETWEEN \", \"'\", startdate, \"' AND '\", enddate, \"' GROUP BY [TriageAcuityCode], StartDate, FacilityLongName, TriageAcuityDescription, FirstEmergencyAreaDescription ORDER BY StartDate,[TriageAcuityCode], FirstEmergencyAreaDescription, FacilityLongName\")\n     \n      # Pull data from data warehouse: \n      edData <- data.frame(sqlQuery(cnx, query1))\n      \n      if (ctas==TRUE && edArea==TRUE){\n            return(edData)\n            \n      } else if (ctas==FALSE && edArea==FALSE) {\n            # USING SQLDF::sqldf TO RUN SQL COMMANDS ON DATA: \n            edData2 <- sqldf(\"SELECT StartDate, FacilityLongName, SUM(num_cases) as num_cases FROM edData GROUP BY StartDate, FacilityLongName ORDER BY StartDate\")\n            \n            ed.data.m <- melt(edData2, \n                              id.vars=c(\"FacilityLongName\", \"StartDate\"))\n            ed.data.w <- dcast(ed.data.m, FacilityLongName~StartDate) #%>% print\n            \n            return(ed.data.w)\n            \n      } else if (ctas==TRUE && edArea==FALSE) {\n            edData3 <- sqldf(\"SELECT StartDate, FacilityLongName, TriageAcuityDescription, [TriageAcuityCode], SUM(num_cases) as num_cases FROM edData GROUP BY StartDate, FacilityLongName, TriageAcuityDescription, [TriageAcuityCode] ORDER BY StartDate, TriageAcuityDescription, [TriageAcuityCode]\")\n            \n            return(edData3)\n      } else if (ctas==FALSE && edArea==TRUE) {\n            edData4 <- sqldf(\"SELECT StartDate, FacilityLongName, FirstEmergencyAreaDescription, SUM(num_cases) as num_cases FROM edData GROUP BY StartDate, FacilityLongName, FirstEmergencyAreaDescription ORDER BY StartDate, FirstEmergencyAreaDescription\")\n            \n      }\n      \n}\n\n\n# test the function: \n# extractED_data(\"2017-01-01\", \"2017-01-05\")\n",
+    "created" : 1509133950033.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1673833912",
+    "id" : "A7948E27",
+    "lastKnownWriteTime" : 1511482567,
+    "last_content_update" : 1511482567,
+    "path" : "//vch.ca/departments/Projects (Dept VC)/Patient Flow Project/Coastal HSDA/2017 Requests/2017.09.21 Long weekend surge planning/src/ed.visits.from.edmart_function.R",
+    "project_path" : "ed.visits.from.edmart_function.R",
+    "properties" : {
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

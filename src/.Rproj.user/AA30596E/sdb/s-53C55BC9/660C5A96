@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "\n\n# Function specification: \n# takes start and end date, returns daily admits for relevant units. \n\n\n\n## get admissions data: \nextractAdmissions <- function(startdate, enddate){\n      \n      # ensure packages are available: \n      stopifnot(c(require(\"RODBC\"), \n                  require(\"sqldf\"), \n                  require(\"dplyr\"), \n                  require(\"reshape2\")))\n      \n      # write out query: \n      \n      query1 <- paste0(\"SELECT [AdmissionFacilityLongName], AdjustedAdmissionDate, [AdmissionNursingUnitCode], [AdmissionNursingUnitDesc] FROM [ADTCMart].[ADTC].[vwAdmissionDischargeFact] WHERE [AdmissionFacilityLongName]= 'Lions Gate Hospital' AND AdjustedAdmissionDate BETWEEN '\",\n                       startdate, \"'\", \n                       \" AND '\", \n                       enddate, \"'\", \n                       \" ORDER BY AdjustedAdmissionDate, [AdmissionNursingUnitCode], [AdmissionNursingUnitDesc];\") \n      \n      # pull from adtc: \n      cnx <- odbcConnect(\"nayef_cnxn\") \n      admData <- data.frame(sqlQuery(cnx, query1))\n      \n      # USING SQLDF::sqldf TO RUN SQL COMMANDS ON DATA: \n      admData2 <- sqldf(\"SELECT [AdmissionFacilityLongName], AdjustedAdmissionDate, [AdmissionNursingUnitCode], [AdmissionNursingUnitDesc], COUNT(*) as num_cases FROM admData GROUP BY [AdmissionFacilityLongName], AdjustedAdmissionDate, [AdmissionNursingUnitCode], [AdmissionNursingUnitDesc]\")\n      \n      admData2 <- select(admData2, 2:ncol(admData2)) %>% \n            filter(AdmissionNursingUnitCode %in% \n                         c(\"EIP\", \"2E\", \"4E\", \"4W\",\n                           \"5E\", \"6E\", \"6W\", \"7E\",\n                           \"ICU\", \"MIU\", \"7W\",\n                           \"Carlile Youth CD Ctr - IP\")) %>% \n            mutate(AdjustedAdmissionDate=as.Date(AdjustedAdmissionDate))\n      return(admData2)\n}\n\n\n\n# test function: \n# extractAdmissions(\"2017-01-01\", \"2017-01-10\")\n",
+    "created" : 1506038993081.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "378520768",
+    "id" : "660C5A96",
+    "lastKnownWriteTime" : 1506039605,
+    "last_content_update" : -2147483648,
+    "path" : "//vch.ca/departments/Projects (Dept VC)/Patient Flow Project/Coastal HSDA/2017 Requests/2017.09.21 Long weekend surge planning/src/admits.from.adtc_function.R",
+    "project_path" : "admits.from.adtc_function.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

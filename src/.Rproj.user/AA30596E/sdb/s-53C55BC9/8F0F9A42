@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "\n\n#*******************************\n# LGH SURGE PLANNING: EXTRACT PAST YEAR ADTC data, ed visits \n#*******************************\n\n# rm(list=ls())\n\nsetwd(\"//vch.ca/departments/Projects (Dept VC)/Patient Flow Project/Coastal HSDA/2017 Requests/2017.09.21 Long weekend surge planning/src\")\n# list.files()\n\n# source data extraction functions: --------------\nsource(\"admits.from.adtc_function.R\")  # ignore output\nsource(\"ed.visits.from.edmart_function.R\")\nsource(\"census.from.adtc_function.R\")\nsource(\"transfers.from.adtc_function.R\")\nsource(\"merge.admits.transfers_function.R\")\n\n# 1. EXTRACT PAST YEAR DATA: ----------------------\nstartdate2016 <- '2016-11-10'\nenddate2016 <- '2016-11-15'\n\ncensus2016 <- extractCensusData(startdate2016, \n                                enddate2016, format=\"wide\")\n\nadmits2016 <- extractAdmissions(startdate2016, \n                               enddate2016)  \n\ntransfers2016 <- transferData(startdate2016, \n                              enddate2016)\n\ned_data2016 <- extractED_data(startdate2016, \n                              enddate2016, \n                              ctas=FALSE, edArea=FALSE)\n\n# merge admits and transfers: \nadmits_and_transfers2016 <- merge.admits.transf(admits2016, \n                                                transfers2016, \n                                                startdate2016, \n                                                enddate2016)\n\n\n\n# 2. Write stuff to csv: ----------------------\nwrite.csv(census2016, file=\"\\\\\\\\vch.ca/departments/Projects (Dept VC)/Patient Flow Project/Coastal HSDA/2017 Requests/2017.09.21 Long weekend surge planning/results/output from src/census.csv\", row.names = FALSE)\n\nwrite.csv(admits_and_transfers2016, file=\"\\\\\\\\vch.ca/departments/Projects (Dept VC)/Patient Flow Project/Coastal HSDA/2017 Requests/2017.09.21 Long weekend surge planning/results/output from src/admits-and-transfers.csv\", row.names = FALSE)\n\nwrite.csv(ed_data2016, file=\"\\\\\\\\vch.ca/departments/Projects (Dept VC)/Patient Flow Project/Coastal HSDA/2017 Requests/2017.09.21 Long weekend surge planning/results/output from src/ed-visits.csv\", row.names = FALSE)\n\n#************************************\n\n",
+    "created" : 1509133192750.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1286118419",
+    "id" : "8F0F9A42",
+    "lastKnownWriteTime" : 1509136113,
+    "last_content_update" : -2147483648,
+    "path" : "//vch.ca/departments/Projects (Dept VC)/Patient Flow Project/Coastal HSDA/2017 Requests/2017.09.21 Long weekend surge planning/src/2017-10-27_surge-planning-analysis.R",
+    "project_path" : "2017-10-27_surge-planning-analysis.R",
+    "properties" : {
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

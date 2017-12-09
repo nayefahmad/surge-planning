@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "\n#******************************\n# this script reads in sick call data, outputs cleaned version for analysis. This script only needs to be run once. \n#******************************\n\n# example of LOCF() \n# library(\"DescTools\")\n# d.frm <- data.frame(\n#       tag=rep(c(\"mo\", \"di\", \"mi\", \"do\", \"fr\", \"sa\", \"so\"), 4)\n#       , val=rep(c(runif(5), rep(NA,2)), 4) )\n# \n# d.frm$locf <- LOCF( d.frm$val )\n# d.frm\n\n\nlibrary(\"dplyr\")\n# rm(list=ls())\n\n# read in data: \ncalls.orig <- read.csv(\"\\\\\\\\vch.ca/departments/Projects (Dept VC)/Patient Flow Project/Coastal HSDA/2017 Requests/2017.09.21 Long weekend surge planning/results/clean data/LGH Sick Hours-COPY.csv\", \n                       stringsAsFactors = FALSE, \n                       na.strings = c(\"\", NA))\n\ncalls <- calls.orig\nnames(calls) <- tolower(names(calls))\n\nstr(calls)\nsummary(calls)\n\n\n# new columns with filled in values \ncalls$site.description2 <- LOCF(calls$site.description)\ncalls$unit2 <- LOCF(calls$unit)\ncalls$date2 <- LOCF(calls$date)\ncalls$dow2 <- LOCF(calls$dow)\ncalls$reason2 <- LOCF(calls$reason)\ncalls$job.family2 <- LOCF(calls$job.family)\ncalls$jobcode2 <- LOCF(calls$jobcode)\n\nstr(calls)\nsummary(calls)\n\n\n# write data to csv: \nwrite.csv(calls, \n          file=\"\\\\\\\\vch.ca/departments/Projects (Dept VC)/Patient Flow Project/Coastal HSDA/2017 Requests/2017.09.21 Long weekend surge planning/results/output from src/LGH-Sick-Hours_with-old-columns.csv\", \n          row.names = FALSE)\n\n\n\n# remove old columns: \ncalls.updated <- select(calls, -c(1:7)) %>% \n      select(2:8,1)\nstr(calls.updated)\n\n\n# write to csv: \nwrite.csv(calls.updated, \n          file=\"\\\\\\\\vch.ca/departments/Projects (Dept VC)/Patient Flow Project/Coastal HSDA/2017 Requests/2017.09.21 Long weekend surge planning/results/output from src/LGH-Sick-Hours_updated.csv\", \n          row.names = FALSE)\n\n\n\n",
+    "created" : 1506364724719.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "723567459",
+    "id" : "B4886288",
+    "lastKnownWriteTime" : 1509135652,
+    "last_content_update" : -2147483648,
+    "path" : "//vch.ca/departments/Projects (Dept VC)/Patient Flow Project/Coastal HSDA/2017 Requests/2017.09.21 Long weekend surge planning/src/extract.sick.calls_function.R",
+    "project_path" : "extract.sick.calls_function.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

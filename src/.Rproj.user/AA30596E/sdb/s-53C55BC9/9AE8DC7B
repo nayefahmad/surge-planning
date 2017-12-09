@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "\n\n# Function specification: \n# takes start and end date, returns daily transfers in for relevant units. \n\ntransferData <- function(startdate, enddate){\n      \n      # ensure packages are available: \n      stopifnot(c(require(\"RODBC\"), \n                  require(\"sqldf\"), \n                  require(\"dplyr\"), \n                  require(\"reshape2\")))\n      \n      query2 <- paste0(\"SELECT [ToFacilityLongName], [TransferDate], [ToNursingUnitCode] FROM [ADTCMart].[ADTC].[vwTransferFact] WHERE [ToFacilityLongName]= 'Lions Gate Hospital' AND [TransferDate] BETWEEN '\",\n                       startdate, \"'\", \" AND '\", enddate, \"'\",\n                       \" ORDER BY [TransferDate], [ToNursingUnitCode];\")\n      \n      # pull data from ADTC using the ODBC connection\n      cnx <- odbcConnect(\"nayef_cnxn\") \n      transferData <- data.frame(sqlQuery(cnx, query2))\n      \n      # USING SQLDF::sqldf TO RUN SQL COMMANDS ON DATA: \n      transferData2 <- sqldf(\"SELECT [ToFacilityLongName], [TransferDate], [ToNursingUnitCode], COUNT(*) as num_cases FROM transferData GROUP BY [ToFacilityLongName], [TransferDate], [ToNursingUnitCode] ORDER BY [ToFacilityLongName], [TransferDate], [ToNursingUnitCode]\")\n      \n      transferData2 <- select(transferData2, 2:ncol(transferData2)) %>% \n            filter(ToNursingUnitCode %in% \n                         c(\"EIP\", \"2E\", \"4E\", \"4W\", \"5E\",\n                           \"6E\", \"6W\", \"7E\", \"ICU\", \"MIU\",\n                           \"7W\", \"Carlile Youth CD Ctr - IP\")) %>% \n            mutate(TransferDate=as.Date(TransferDate))\n      \n      return(transferData2)\n}\n\n\n# test the function: \n# transferData(\"2017-01-01\", \n#              \"2017-01-05\")\n\n",
+    "created" : 1506039286321.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1557652684",
+    "id" : "9AE8DC7B",
+    "lastKnownWriteTime" : 1506039725,
+    "last_content_update" : -2147483648,
+    "path" : "//vch.ca/departments/Projects (Dept VC)/Patient Flow Project/Coastal HSDA/2017 Requests/2017.09.21 Long weekend surge planning/src/transfers.from.adtc_function.R",
+    "project_path" : "transfers.from.adtc_function.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

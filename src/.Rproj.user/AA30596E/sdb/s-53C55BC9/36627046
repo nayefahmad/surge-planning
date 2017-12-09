@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "\n# Function specification: \n# takes start and end date, returns daily census for relevant units. \n\n\n# todo: ------\n\n\nextractCensusData <- function(startdate, enddate, format='wide'){\n      \n      # ensure packages are available: \n      stopifnot(c(require(\"RODBC\"), \n                  require(\"sqldf\"), \n                  require(\"dplyr\"), \n                  require(\"reshape2\")))\n      \n      # write out query: \n      query1 <- paste0(\"SELECT [FacilityLongName], CensusDate, [NursingUnitCode], [NursingUnitDesc] FROM [ADTCMart].[ADTC].[vwCensusFact] WHERE [FacilityLongName]='Lions Gate Hospital' AND CensusDate BETWEEN '\",\n                       startdate,\n                       \"'\", \" AND '\", \n                       enddate, \"'\", \n                       \" ORDER BY CensusDate, [NursingUnitCode], [NursingUnitDesc];\")  \n      # pull data from ADTC and save as dataframe: \n      cnx <- odbcConnect(\"nayef_cnxn\") \n      censusData <- data.frame(sqlQuery(cnx, query1))\n      \n      # USING SQLDF::sqldf TO RUN SQL COMMANDS ON DATA: \n      censusData2 <- sqldf(\"SELECT *, COUNT(*) as num_cases FROM censusData GROUP BY FacilityLongName, CensusDate, NursingUnitCode, NursingUnitDesc ORDER BY CensusDate, NursingUnitCode\")\n      \n      # FINAL FORMATTING OF DATA:\n      censusData2 <- filter(censusData2, NursingUnitCode %in% \n                                  c(\"EIP\", \n                                    \"2E\",\n                                    \"4E\",\n                                    \"4W\",\n                                    \"5E\",\n                                    \"6E\",\n                                    \"6W\",\n                                    \"7E\", \n                                    \"ICU\",\n                                    \"MIU\",\n                                    \"7W\", \n                                    \"Carlile Youth CD Ctr - IP\")) %>%\n            mutate(CensusDateChar = as.character(CensusDate)) %>% \n            select(CensusDateChar, \n                   NursingUnitCode,\n                   num_cases)\n      \n      # str(censusData2)  # note that this is not the format we want. We would need to put it into a pivottable to reformat. __OR__....\n      \n      # reshape the data to the form we want: \n      if(format=='wide'){\n            cData2_long <- melt(censusData2)  \n            # first melt the data, then dcast to the format you want. \n            \n            cData2_recast <- dcast(cData2_long, NursingUnitCode ~ CensusDateChar)\n            return(cData2_recast)\n            \n      } else if(format=='long'){\n            return(censusData2)\n      }\n}\n\n\n\n# test the function: ----------\n# census2016 <- extractCensusData(\"2016-09-02\", \n#                                 \"2016-09-06\",\n#                                 format=\"wide\")\n",
+    "created" : 1506039080553.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1336158686",
+    "id" : "36627046",
+    "lastKnownWriteTime" : 1509135558,
+    "last_content_update" : -2147483648,
+    "path" : "//vch.ca/departments/Projects (Dept VC)/Patient Flow Project/Coastal HSDA/2017 Requests/2017.09.21 Long weekend surge planning/src/census.from.adtc_function.R",
+    "project_path" : "census.from.adtc_function.R",
+    "properties" : {
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

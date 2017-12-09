@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "\n\n#*************************************\n# FUNCTION TO MERGE ADMITS AND TRANSFERS FOR SPECIFIED DATES \n#*************************************\n\n# rm(list=ls())\n\n\n# define function: ---------------\nmerge.admits.transf <- function(admits_data, \n                                transfer_data, \n                                startdate, \n                                enddate){\n      \n      # input: df with admits over a time range and another df with transfers\n      # output: df with merge on date\n      \n      # ensure required packages are loaded: \n      stopifnot(c(require(\"RODBC\"), \n                  require(\"sqldf\"), \n                  require(\"dplyr\"), \n                  require(\"reshape2\"), \n                  require(\"lubridate\")))\n            \n      dates <- seq(ymd(startdate), ymd(enddate), by=\"day\") # %>% print \n      units <- c(\"EIP\", \"2E\", \"4E\", \"4W\", \"5E\", \"6E\",\n                 \"6W\", \"7E\", \"ICU\", \"MIU\", \"7W\", \"Carlile Youth CD Ctr - IP\")\n      admits_data <- mutate(admits_data, \n                            AdjustedAdmissionDate=ymd(AdjustedAdmissionDate))\n      \n      left_table <- data.frame(date=rep(dates, each=length(units)), \n                               unit =rep(units, length(dates))) # %>% print \n      \n      \n      left_and_admits <- sqldf(\"SELECT date, unit, AdjustedAdmissionDate, AdmissionNursingUnitCode, num_cases FROM left_table LEFT JOIN admits_data ON (date=AdjustedAdmissionDate and unit=AdmissionNursingUnitCode)\") # %>% print \n      \n      admits_and_transfers <- sqldf(\"SELECT date, unit, AdjustedAdmissionDate, AdmissionNursingUnitCode, l.num_cases as admits, ToNursingUnitCode, t.num_cases as transfers FROM left_and_admits l LEFT JOIN transfer_data t ON (date=TransferDate AND unit=ToNursingUnitCode)\") # %>% print \n      \n      \n      admits_and_transfers <- \n            mutate(admits_and_transfers, \n                   admits=sapply(admits, \n                                 function(x){if (is.na(x)== TRUE){0} else {x}}), \n                   transfers=sapply(transfers,\n                                    function(x){if (is.na(x)== TRUE){0} else {x}}),             \n                   admits_and_transf=admits+transfers ) %>%\n            \n            select(date, unit, admits, transfers, admits_and_transf)  # %>% print\n      \n      \n      final_admits_and_transfers <- \n            melt(admits_and_transfers, id.vars = c(\"unit\", \"date\")) %>% \n            filter(variable==\"admits_and_transf\") %>% \n            dcast(unit ~ date) # %>% print \n      \n      return(final_admits_and_transfers)\n\n}\n\n\n#*********************************************\n# test the function: ------------\n# source(\"admits.from.adtc_function.R\")\n# source(\"transfers.from.adtc_function.R\")\n# \n# admits <- extractAdmissions(\"2016-10-07\",\n#                             \"2016-10-11\")\n# transfers <- transferData(\"2016-10-07\", \n#                           \"2016-10-11\")\n#              \n# merged <- merge.admits.transf(admits, transfers, \n#                               \"2016-10-07\", \n#                               \"2016-10-11\") %>% print \n",
+    "created" : 1506039778008.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3140054681",
+    "id" : "E9D30378",
+    "lastKnownWriteTime" : 1509133077,
+    "last_content_update" : -2147483648,
+    "path" : "//vch.ca/departments/Projects (Dept VC)/Patient Flow Project/Coastal HSDA/2017 Requests/2017.09.21 Long weekend surge planning/src/merge.admits.transfers_function.R",
+    "project_path" : "merge.admits.transfers_function.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
