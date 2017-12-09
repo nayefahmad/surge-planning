@@ -21,7 +21,7 @@ extractCensusData <- function(startdate, enddate, format='wide'){
                        enddate, "'", 
                        " ORDER BY CensusDate, [NursingUnitCode], [NursingUnitDesc];")  
       # pull data from ADTC and save as dataframe: 
-      cnx <- odbcConnect("nayef_cnxn") 
+      cnx <- odbcConnect("cnx_SPDBSCSTA001") 
       censusData <- data.frame(sqlQuery(cnx, query1))
       
       # USING SQLDF::sqldf TO RUN SQL COMMANDS ON DATA: 

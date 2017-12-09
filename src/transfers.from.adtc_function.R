@@ -16,7 +16,7 @@ transferData <- function(startdate, enddate){
                        " ORDER BY [TransferDate], [ToNursingUnitCode];")
       
       # pull data from ADTC using the ODBC connection
-      cnx <- odbcConnect("nayef_cnxn") 
+      cnx <- odbcConnect("cnx_SPDBSCSTA001") 
       transferData <- data.frame(sqlQuery(cnx, query2))
       
       # USING SQLDF::sqldf TO RUN SQL COMMANDS ON DATA: 

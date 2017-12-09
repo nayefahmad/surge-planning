@@ -23,7 +23,7 @@ extractAdmissions <- function(startdate, enddate){
                        " ORDER BY AdjustedAdmissionDate, [AdmissionNursingUnitCode], [AdmissionNursingUnitDesc];") 
       
       # pull from adtc: 
-      cnx <- odbcConnect("nayef_cnxn") 
+      cnx <- odbcConnect("cnx_SPDBSCSTA001") 
       admData <- data.frame(sqlQuery(cnx, query1))
       
       # USING SQLDF::sqldf TO RUN SQL COMMANDS ON DATA: 
