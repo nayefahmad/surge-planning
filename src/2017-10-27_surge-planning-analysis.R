@@ -1,12 +1,11 @@
 
 
 #*******************************
-# LGH SURGE PLANNING: EXTRACT PAST YEAR ADTC, ed visits 
+# LGH SURGE PLANNING: EXTRACT PAST YEAR ADTC data, ed visits 
 #*******************************
 
 # rm(list=ls())
 
-setwd("//vch.ca/departments/Projects (Dept VC)/Patient Flow Project/Coastal HSDA/2017 Requests/2017.09.21 Long weekend surge planning/src")
 # list.files()
 
 # source data extraction functions: --------------
@@ -17,36 +16,45 @@ source("transfers.from.adtc_function.R")
 source("merge.admits.transfers_function.R")
 
 # 1. EXTRACT PAST YEAR DATA: ----------------------
-startdate2016 <- '2016-09-02'
-enddate2016 <- '2016-09-06'
+startdate.past.year <- '2017-02-12'
+enddate.past.year <- '2017-02-20'
 
-census2016 <- extractCensusData(startdate2016, 
-                                enddate2016, format="wide")
+census.df <- extractCensusData(startdate.past.year, 
+                                enddate.past.year, format="wide")
 
-admits2016 <- extractAdmissions(startdate2016, 
-                               enddate2016)  
+admits.df <- extractAdmissions(startdate.past.year, 
+                               enddate.past.year)  
 
-transfers2016 <- transferData(startdate2016, 
-                              enddate2016)
+transfers.df <- transferData(startdate.past.year, 
+                              enddate.past.year)
 
-ed_data2016 <- extractED_data(startdate2016, 
-                              enddate2016, 
+ed_data.df <- extractED_data(startdate.past.year, 
+                              enddate.past.year, 
                               ctas=FALSE, edArea=FALSE)
 
 # merge admits and transfers: 
-admits_and_transfers2016 <- merge.admits.transf(admits2016, 
-                                                transfers2016, 
-                                                startdate2016, 
-                                                enddate2016)
+admits_and_transfers.df <- merge.admits.transf(admits.df, 
+                                                transfers.df, 
+                                                startdate.past.year, 
+                                                enddate.past.year)
 
 
 
 # 2. Write stuff to csv: ----------------------
-write.csv(census2016, file="\\\\vch.ca/departments/Projects (Dept VC)/Patient Flow Project/Coastal HSDA/2017 Requests/2017.09.21 Long weekend surge planning/results/output from src/census.csv", row.names = FALSE)
+output.path <- "\\\\vch.ca/departments/Projects (Dept VC)/Patient Flow Project/Coastal HSDA/2017 Requests/2017.09.21 Long weekend surge planning/results/output from src" 
 
-write.csv(admits_and_transfers2016, file="\\\\vch.ca/departments/Projects (Dept VC)/Patient Flow Project/Coastal HSDA/2017 Requests/2017.09.21 Long weekend surge planning/results/output from src/admits-and-transfers.csv", row.names = FALSE)
 
-write.csv(ed_data2016, file="\\\\vch.ca/departments/Projects (Dept VC)/Patient Flow Project/Coastal HSDA/2017 Requests/2017.09.21 Long weekend surge planning/results/output from src/ed-visits.csv", row.names = FALSE)
+write.csv(census.df, 
+          file = paste0(output.path, "/census.csv"),
+          row.names = FALSE)
+
+write.csv(admits_and_transfers.df, 
+          file = paste0(output.path, "/admits-and-transfers.csv") ,
+          row.names = FALSE)
+
+write.csv(ed_data.df, 
+          file = paste0(output.path, "/ed-visits.csv"),
+          row.names = FALSE)
 
 #************************************
 
