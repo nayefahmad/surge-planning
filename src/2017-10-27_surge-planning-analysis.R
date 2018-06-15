@@ -4,16 +4,19 @@
 # LGH SURGE PLANNING: EXTRACT PAST YEAR ADTC data, ed visits 
 #*******************************
 
+library("here")
+library("readr")
+
 # rm(list=ls())
 
 # list.files()
 
 # source data extraction functions: --------------
-source("admits.from.adtc_function.R")  # ignore output
-source("ed.visits.from.edmart_function.R")
-source("census.from.adtc_function.R")
-source("transfers.from.adtc_function.R")
-source("merge.admits.transfers_function.R")
+source(here("src", "admits.from.adtc_function.R"))  # ignore output
+source(here("src", "ed.visits.from.edmart_function.R"))
+source(here("src", "census.from.adtc_function.R"))
+source(here("src", "transfers.from.adtc_function.R"))
+source(here("src", "merge.admits.transfers_function.R"))
 
 # 1. EXTRACT PAST YEAR DATA: ----------------------
 startdate.past.year <- '2017-02-12'
@@ -41,20 +44,21 @@ admits_and_transfers.df <- merge.admits.transf(admits.df,
 
 
 # 2. Write stuff to csv: ----------------------
-output.path <- "\\\\vch.ca/departments/Projects (Dept VC)/Patient Flow Project/Coastal HSDA/2017 Requests/2017.09.21 Long weekend surge planning/results/output from src" 
+# lubridate doesn't play well with here(): 
+detach("package:lubridate", unload=TRUE)
+
+output.path <- here("results", 
+                    "output from src") 
 
 
-write.csv(census.df, 
-          file = paste0(output.path, "/census.csv"),
-          row.names = FALSE)
+write_csv(census.df, 
+          paste0(output.path, "/census.csv"))
 
-write.csv(admits_and_transfers.df, 
-          file = paste0(output.path, "/admits-and-transfers.csv") ,
-          row.names = FALSE)
+write_csv(admits_and_transfers.df, 
+          paste0(output.path, "/admits-and-transfers.csv"))
 
 write.csv(ed_data.df, 
-          file = paste0(output.path, "/ed-visits.csv"),
-          row.names = FALSE)
+          paste0(output.path, "/ed-visits.csv"))
 
 #************************************
 
