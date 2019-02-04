@@ -31,9 +31,20 @@ extractAdmissions <- function(startdate, enddate){
       
       admData2 <- select(admData2, 2:ncol(admData2)) %>% 
             filter(AdmissionNursingUnitCode %in% 
-                         c("EIP", "2E", "4E", "4W",
-                           "5E", "6E", "6W", "7E",
-                           "ICU", "MIU", "7W",
+                         c("EIP", 
+                           "2E",
+                           "3E", 
+                           "3W", 
+                           "4E",
+                           "4W",
+                           "5E",
+                           "6E",
+                           "6W",
+                           "7E",
+                           "7W", 
+                           "ICU",
+                           "MIU",
+                           "7W", 
                            "Carlile Youth CD Ctr - IP")) %>% 
             mutate(AdjustedAdmissionDate=as.Date(AdjustedAdmissionDate))
       return(admData2)

@@ -24,9 +24,21 @@ transferData <- function(startdate, enddate){
       
       transferData2 <- select(transferData2, 2:ncol(transferData2)) %>% 
             filter(ToNursingUnitCode %in% 
-                         c("EIP", "2E", "4E", "4W", "5E",
-                           "6E", "6W", "7E", "ICU", "MIU",
-                           "7W", "Carlile Youth CD Ctr - IP")) %>% 
+                         c("EIP", 
+                           "2E",
+                           "3E", 
+                           "3W", 
+                           "4E",
+                           "4W",
+                           "5E",
+                           "6E",
+                           "6W",
+                           "7E",
+                           "7W", 
+                           "ICU",
+                           "MIU",
+                           "7W", 
+                           "Carlile Youth CD Ctr - IP")) %>% 
             mutate(TransferDate=as.Date(TransferDate))
       
       return(transferData2)
