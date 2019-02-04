@@ -19,13 +19,27 @@ merge.admits.transf <- function(admits_data,
       # ensure required packages are loaded: 
       stopifnot(c(require("RODBC"), 
                   require("sqldf"), 
-                  require("dplyr"), 
+                  require("dplyr"),
+                  require("tidyr"), 
                   require("reshape2"), 
                   require("lubridate")))
             
       dates <- seq(ymd(startdate), ymd(enddate), by="day") # %>% print 
-      units <- c("EIP", "2E", "4E", "4W", "5E", "6E",
-                 "6W", "7E", "ICU", "MIU", "7W", "Carlile Youth CD Ctr - IP")
+      units <- c("EIP", 
+                 "2E",
+                 "3E", 
+                 "3W", 
+                 "4E",
+                 "4W",
+                 "5E",
+                 "6E",
+                 "6W",
+                 "7E",
+                 "7W", 
+                 "ICU",
+                 "MIU",
+                 "7W", 
+                 "Carlile Youth CD Ctr - IP")
       admits_data <- mutate(admits_data, 
                             AdjustedAdmissionDate=ymd(AdjustedAdmissionDate))
       
@@ -33,28 +47,33 @@ merge.admits.transf <- function(admits_data,
                                unit =rep(units, length(dates))) # %>% print 
       
       
-      left_and_admits <- sqldf("SELECT date, unit, AdjustedAdmissionDate, AdmissionNursingUnitCode, num_cases FROM left_table LEFT JOIN admits_data ON (date=AdjustedAdmissionDate and unit=AdmissionNursingUnitCode)") # %>% print 
+      left_and_admits <-  left_table %>% 
+            left_join(admits_data, 
+                      by = c("date" = "AdjustedAdmissionDate", 
+                             "unit" = "AdmissionNursingUnitCode"))  # %>% print
       
-      admits_and_transfers <- sqldf("SELECT date, unit, AdjustedAdmissionDate, AdmissionNursingUnitCode, l.num_cases as admits, ToNursingUnitCode, t.num_cases as transfers FROM left_and_admits l LEFT JOIN transfer_data t ON (date=TransferDate AND unit=ToNursingUnitCode)") # %>% print 
-      
-      
-      admits_and_transfers <- 
-            mutate(admits_and_transfers, 
-                   admits=sapply(admits, 
-                                 function(x){if (is.na(x)== TRUE){0} else {x}}), 
-                   transfers=sapply(transfers,
-                                    function(x){if (is.na(x)== TRUE){0} else {x}}),             
-                   admits_and_transf=admits+transfers ) %>%
+      admits_and_transfers <- left_and_admits %>% 
+            left_join(transfer_data, 
+                      by = c("date" = "TransferDate", 
+                             "unit" = "ToNursingUnitCode")) %>% 
+            rename(admits = num_cases.x, 
+                    transfers = num_cases.y)  # %>% print
             
-            select(date, unit, admits, transfers, admits_and_transf)  # %>% print
+            
+      admits_and_transfers <- admits_and_transfers %>% 
+            replace_na(replace = list(admits = 0, 
+                                      transfers = 0)) %>% 
+            
+            mutate(admits_and_transf = admits + transfers) %>%
+            
+            select(date, unit, admits, transfers, admits_and_transf) %>%
+            
+            # change format so dates are across columns
+            melt(id.vars = c("unit", "date")) %>% 
+            filter(variable=="admits_and_transf") %>%
+            dcast(unit ~ date, sum) # %>% print
       
-      
-      final_admits_and_transfers <- 
-            melt(admits_and_transfers, id.vars = c("unit", "date")) %>% 
-            filter(variable=="admits_and_transf") %>% 
-            dcast(unit ~ date) # %>% print 
-      
-      return(final_admits_and_transfers)
+      return(admits_and_transfers)
 
 }
 
@@ -64,11 +83,11 @@ merge.admits.transf <- function(admits_data,
 # source("admits.from.adtc_function.R")
 # source("transfers.from.adtc_function.R")
 # 
-# admits <- extractAdmissions("2016-10-07",
-#                             "2016-10-11")
-# transfers <- transferData("2016-10-07", 
-#                           "2016-10-11")
-#              
-# merged <- merge.admits.transf(admits, transfers, 
-#                               "2016-10-07", 
-#                               "2016-10-11") %>% print 
+admits <- extractAdmissions("2016-10-07",
+                            "2016-10-11")
+transfers <- transferData("2016-10-07",
+                          "2016-10-11")
+
+merged <- merge.admits.transf(admits, transfers,
+                              "2016-10-07",
+                              "2016-10-11")  # %>% print
