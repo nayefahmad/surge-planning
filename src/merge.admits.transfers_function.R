@@ -38,7 +38,6 @@ merge.admits.transf <- function(admits_data,
                  "7W", 
                  "ICU",
                  "MIU",
-                 "7W", 
                  "Carlile Youth CD Ctr - IP")
       admits_data <- mutate(admits_data, 
                             AdjustedAdmissionDate=ymd(AdjustedAdmissionDate))
@@ -83,11 +82,11 @@ merge.admits.transf <- function(admits_data,
 # source("admits.from.adtc_function.R")
 # source("transfers.from.adtc_function.R")
 # 
-admits <- extractAdmissions("2016-10-07",
-                            "2016-10-11")
-transfers <- transferData("2016-10-07",
-                          "2016-10-11")
-
-merged <- merge.admits.transf(admits, transfers,
-                              "2016-10-07",
-                              "2016-10-11")  # %>% print
+# admits <- extractAdmissions("2018-02-09",
+#                             "2018-02-13")
+# transfers <- transferData("2018-02-09",
+#                           "2018-02-13")
+# 
+# merged <- merge.admits.transf(admits, transfers,
+#                               "2018-02-09",
+#                               "2018-02-13")  # %>% print

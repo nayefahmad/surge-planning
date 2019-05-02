@@ -12,15 +12,15 @@ library("readr")
 # list.files()
 
 # source data extraction functions: --------------
-source(here("src", "admits.from.adtc_function.R"))  # ignore output
+source(here("src", "admits.from.adtc_function.R"))  
 source(here("src", "ed.visits.from.edmart_function.R"))
 source(here("src", "census.from.adtc_function.R"))
 source(here("src", "transfers.from.adtc_function.R"))
 source(here("src", "merge.admits.transfers_function.R"))
 
 # 1. EXTRACT PAST YEAR DATA: ----------------------
-startdate.past.year <- '2017-02-12'
-enddate.past.year <- '2017-02-20'
+startdate.past.year <- '2018-02-09'
+enddate.past.year <- '2018-02-13'
 
 census.df <- extractCensusData(startdate.past.year, 
                                 enddate.past.year, format="wide")

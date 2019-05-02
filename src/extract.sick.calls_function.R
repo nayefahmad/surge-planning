@@ -1,7 +1,7 @@
 
-
+#******************************
 # this script reads in sick call data, outputs cleaned version for analysis. This script only needs to be run once. 
-
+#******************************
 
 # example of LOCF() 
 # library("DescTools")
@@ -14,50 +14,64 @@
 
 
 library("dplyr")
+library("here")
+library("DescTools")
+
 # rm(list=ls())
 
-# read in data: 
-calls.orig <- read.csv("\\\\vch.ca/departments/Projects (Dept VC)/Patient Flow Project/Coastal HSDA/2017 Requests/2017.09.21 Long weekend surge planning/results/clean data/LGH Sick Hours-COPY.csv", 
-                       stringsAsFactors = FALSE, 
-                       na.strings = c("", NA))
+# set dates we care about: 
+startdate.past.year <- '2017-06-29'
+enddate.past.year <- '2017-07-05'
+past.year.interval <- seq(as.Date(startdate.past.year), 
+                          as.Date(enddate.past.year), 
+                          by="1 day")
 
-calls <- calls.orig
+
+# read in data: 
+calls.orig <- read_csv(here("data",
+                            "2018-06-18_LGH_sick_call_staff_scheduling_data.csv"))
+
+calls <- calls.orig %>% 
+      select(-`Labor Agreement`)
+
 names(calls) <- tolower(names(calls))
 
 str(calls)
 summary(calls)
 
+# replace NAs with 0: 
+# calls[is.na(calls)] <- 0
 
 # new columns with filled in values 
-calls$site.description2 <- LOCF(calls$site.description)
+calls$site2 <- LOCF(calls$site)
 calls$unit2 <- LOCF(calls$unit)
 calls$date2 <- LOCF(calls$date)
-calls$dow2 <- LOCF(calls$dow)
-calls$reason2 <- LOCF(calls$reason)
-calls$job.family2 <- LOCF(calls$job.family)
-calls$jobcode2 <- LOCF(calls$jobcode)
+calls$day.of.week2 <- LOCF(calls$`day of week`)
+# calls$reason2 <- LOCF(calls$reason)
+calls$job.title2 <- LOCF(calls$`job title`)
+calls$jobcode2 <- LOCF(calls$`job code`)
 
 str(calls)
 summary(calls)
 
 
 # write data to csv: 
-write.csv(calls, 
-          file="\\\\vch.ca/departments/Projects (Dept VC)/Patient Flow Project/Coastal HSDA/2017 Requests/2017.09.21 Long weekend surge planning/results/output from src/LGH-Sick-Hours_with-old-columns.csv", 
-          row.names = FALSE)
+write_csv(calls %>% 
+                select(site2, 
+                       unit2, 
+                       date2, 
+                       day.of.week2, 
+                       code,
+                       job.title2, 
+                       jobcode2), 
+                # filter(date2 %in% past.year.interval),  # todo: why doesn't filtering work? 
+          here("results", 
+               "output from src", 
+               "2018-06-18_lgh_sick-call-data.csv"))
+          
 
 
 
-# remove old columns: 
-calls.updated <- select(calls, -c(1:7)) %>% 
-      select(2:8,1)
-str(calls.updated)
-
-
-# write to csv: 
-write.csv(calls.updated, 
-          file="\\\\vch.ca/departments/Projects (Dept VC)/Patient Flow Project/Coastal HSDA/2017 Requests/2017.09.21 Long weekend surge planning/results/output from src/LGH-Sick-Hours_updated.csv", 
-          row.names = FALSE)
 
 
 
