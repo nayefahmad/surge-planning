@@ -33,7 +33,12 @@ extract_census <- function(startdate_id,
              
             group_by(census_date_id, 
                      nursing_unit_cd) %>%
-            summarise(census = n())
+            summarise(census = n()) %>% 
+            
+            # display in long format: 
+            gather(key = "census",
+                   value = "value", 
+                   -c(census_date_id, nursing_unit_cd))
       
       
 }
