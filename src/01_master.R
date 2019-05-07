@@ -14,7 +14,7 @@ library(tidyverse)
 
 # 1) parameters: --------------
 startdate_id <- '20180501'
-enddate_id <- '20180501'
+enddate_id <- '20180507'
 
 n_units_param <- c("LGH 2E",
                    "LGH 3E", 
