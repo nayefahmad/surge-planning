@@ -13,6 +13,8 @@ library(magrittr)
 library(tidyverse)
 library(here)
 
+# rm(list = ls())
+
 # 1) parameters: --------------
 startdate_id <- '20180517'
 enddate_id <- '20180521'
@@ -60,6 +62,8 @@ source(here("src",
 
 
 # 4) Run functions: ----------
+
+# LGH data: 
 census <- extract_census(startdate_id, 
                          enddate_id)
 
@@ -70,11 +74,30 @@ admits <- extract_admits(startdate_id,
                          enddate_id)
 
 
+# LGH HOpe Centre data: 
+census_hope_centre <- extract_census(startdate_id, 
+                                     enddate_id, 
+                                     site = "LGH HOpe Centre", 
+                                     n_units = "LGH MIU")
+
+admits_hope_centre <- extract_admits(startdate_id, 
+                                     enddate_id, 
+                                     site = "LGH HOpe Centre", 
+                                     n_units = "LGH MIU")
+
+
+
 # join all together in one df: 
 df1.past_year_data <- 
       census %>% 
-      bind_rows(ed_visits) %>% 
-      bind_rows(admits)  # %>% View("census&ed&admits")
+      bind_rows(census_hope_centre, 
+                admits, 
+                admits_hope_centre, 
+                ed_visits)  
+
+
+
+
 
 
 # 5) write output: -----------

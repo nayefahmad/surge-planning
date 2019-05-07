@@ -49,9 +49,13 @@ extract_admits <- function(startdate_id,
 
 
 # test the function: ------
-library(beepr)
-
-admits <- extract_admits("20180501", 
-                         "20181231"); beep()
-
-admits %>% filter(nursing_unit_cd == "LGH 4E")
+# library(beepr)
+# 
+# admits <- extract_admits("20180209", 
+#                          "20180214"); beep()
+# 
+# admits2 <- extract_admits("20190101", 
+#                           "20190501"); beep()
+# 
+# 
+# admits2 %>% filter(nursing_unit_cd == "LGH 6W") %>% as.data.frame()
