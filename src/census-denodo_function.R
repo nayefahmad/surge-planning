@@ -48,7 +48,7 @@ extract_census <- function(startdate_id,
 
 
 # test the function: ------
-library(beepr)
-
-census <- extract_census("20181212", 
-                         "20181213"); beep()
+# library(beepr)
+# 
+# census <- extract_census("20181212", 
+#                          "20181213"); beep()

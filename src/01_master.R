@@ -11,10 +11,11 @@ library(odbc)
 library(dbplyr)
 library(magrittr)  
 library(tidyverse)
+library(here)
 
 # 1) parameters: --------------
-startdate_id <- '20180501'
-enddate_id <- '20180507'
+startdate_id <- '20180517'
+enddate_id <- '20180521'
 
 n_units_param <- c("LGH 2E",
                    "LGH 3E", 
@@ -49,5 +50,36 @@ vw_adtc <- dplyr::tbl(cnx,
 
 
 
+# 3) Import functions for pulling data: ---------
+source(here("src", 
+            "census-denodo_function.R"))
+source(here("src", 
+            "ed-visits-denodo_function.R"))
+source(here("src", 
+            "admits-denodo_function.R"))
 
 
+# 4) Run functions: ----------
+census <- extract_census(startdate_id, 
+                         enddate_id)
+
+ed_visits <- extract_ed_visits(startdate_id, 
+                               enddate_id)
+
+admits <- extract_admits(startdate_id, 
+                         enddate_id)
+
+
+# join all together in one df: 
+df1.past_year_data <- 
+      census %>% 
+      bind_rows(ed_visits) %>% 
+      bind_rows(admits)  # %>% View("census&ed&admits")
+
+
+# 5) write output: -----------
+write_csv(df1.past_year_data,
+          here::here("results", 
+                         "output from src", 
+                         "2019-05-07_lgh_historical-admits-transfers-ed-visits.csv"))
+                         
