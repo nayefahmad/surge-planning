@@ -15,29 +15,35 @@ extract_ed_visits <- function(startdate_id,
   # > denodo_view is the name of the table saved as a connection via dbplyr 
   
   # outputs: 
-  # dataframe with census dates and census counts, by nursing unit
+  # dataframe with dates and ed visit counts
   
-  vw_census %>% 
+  eddata <- 
+    vw_eddata %>% 
     filter(facility_name == !!(site),  # !! used to unquote the actual argument "site" 
-           census_date_id >= startdate_id, 
-           census_date_id <= enddate_id, 
-           nursing_unit_cd %in% n_units) %>% 
+           start_date_id >= startdate_id, 
+           start_date_id <= enddate_id) %>% 
     
-    select(census_date_id, 
+    select(start_date_id, 
            patient_id, 
-           nursing_unit_cd, 
            facility_name) %>%  # show_query()
     
     collect() %>% 
     
-    group_by(census_date_id, 
-             nursing_unit_cd) %>%
-    summarise(census = n()) %>% 
+    group_by(start_date_id) %>%
+    summarise(num_ED_visits = n())  
+    
+    # long format, matching with census results: 
+  eddata %>%   
+    mutate(nursing_unit_cd = rep(NA, nrow(eddata))) %>% 
+    select(start_date_id, 
+           nursing_unit_cd, 
+           num_ED_visits) %>% 
+    rename(date_id = start_date_id) %>% 
     
     # display in long format: 
-    gather(key = "census",
+    gather(key = "metric",
            value = "value", 
-           -c(census_date_id, nursing_unit_cd))
+           -c(date_id, nursing_unit_cd))
   
   
 }
@@ -48,5 +54,5 @@ extract_ed_visits <- function(startdate_id,
 # test the function: ------
 library(beepr)
 
-census <- extract_census("20181212", 
-                         "20181213"); beep()
+edvisits <- extract_ed_visits("20181212", 
+                              "20181220"); beep()

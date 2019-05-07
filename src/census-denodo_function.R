@@ -34,11 +34,12 @@ extract_census <- function(startdate_id,
             group_by(census_date_id, 
                      nursing_unit_cd) %>%
             summarise(census = n()) %>% 
+            rename(date_id = census_date_id) %>% 
             
             # display in long format: 
-            gather(key = "census",
+            gather(key = "metric",
                    value = "value", 
-                   -c(census_date_id, nursing_unit_cd))
+                   -c(date_id, nursing_unit_cd))
       
       
 }
