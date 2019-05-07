@@ -18,7 +18,7 @@ extract_ed_visits <- function(startdate_id,
   # dataframe with dates and ed visit counts
   
   eddata <- 
-    vw_eddata %>% 
+    denodo_vw %>% 
     filter(facility_name == !!(site),  # !! used to unquote the actual argument "site" 
            start_date_id >= startdate_id, 
            start_date_id <= enddate_id) %>% 

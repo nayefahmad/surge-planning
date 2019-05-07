@@ -18,7 +18,7 @@ extract_census <- function(startdate_id,
       # outputs: 
       # dataframe with census dates and census counts, by nursing unit
       
-      vw_census %>% 
+      denodo_vw %>% 
             filter(facility_name == !!(site),  # !! used to unquote the actual argument "site" 
                    census_date_id >= startdate_id, 
                    census_date_id <= enddate_id, 
