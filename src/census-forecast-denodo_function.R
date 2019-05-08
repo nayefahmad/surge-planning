@@ -11,14 +11,14 @@
 # function definition: 
 census_forecast <- function(startdate_id, 
                             enddate_id, 
-                            past_years = 1,  # todo: change to 5?  
+                            past_years = 3,  # todo: change to 5?  
                             site = "Lions Gate Hospital", 
                             n_unit, 
                             denodo_vw = vw_census){
       
       # inputs: 
       # > start and end date_id: the date range for which to return forecast
-      # > paste_years: how many years historical data to pull for fitting the trend 
+      # > past_years: how many years historical data to pull for fitting the trend 
       # > n_unit: the nursing unit to forecast census for 
       
       # outputs: 
@@ -30,12 +30,9 @@ census_forecast <- function(startdate_id,
       stopifnot(exists("extract_census"))
       
       
-      # historical data range: 
+      # historical data range: --------
       historical_start <- lubridate::ymd(startdate_id) -1 - years(past_years)
       historical_end <- lubridate::ymd(startdate_id) -1 
-      
-      print(c(historical_start, 
-              historical_end))
       
       # start and end as date_ids: 
       historical_start_id <- 
@@ -49,6 +46,7 @@ census_forecast <- function(startdate_id,
             str_replace_all("-", "")
       
       
+      # full date list to join on, in case dates missing in census: 
       full_date_list <- 
             data.frame(date = seq(historical_start, 
                                   historical_end, 
@@ -62,17 +60,51 @@ census_forecast <- function(startdate_id,
                               ))
       
       
-      # pull historical data: 
+      # horizon to forecast: ------------
+      horizon_param <- difftime(ymd(enddate_id),
+                                ymd(startdate_id)) %>% 
+            as.integer() + 1
+      
+      print(list(historical_start, 
+                 historical_end, 
+                 horizon_param))
+      
+      
+      # pull historical data from denodo, using extract_census( ) function: 
       census <- extract_census(historical_start_id, 
                                historical_end_id, 
                                n_units = n_unit) %>% 
             ungroup() %>%  # convert from grouped_df to df
             right_join(full_date_list)
       
-      # todo: join on full date list: 
       
       
-      return(census)
+      # set up data for prophet:  
+      census <- census %>% 
+            select(date, 
+                   value) %>% 
+            rename(ds = date, 
+                   y = value)
+      
+      
+      # fit prophet model: 
+      library(prophet)
+      
+      m <- prophet(census)
+      
+      future <- make_future_dataframe(m, 
+                                      periods = horizon_param,
+                                      freq = "day")  # 20 years, in months
+      print(future)
+      
+      fcast <- predict(m, future) %>% 
+            select(ds, 
+                   yhat_lower, 
+                   yhat, 
+                   yhat_upper)
+      
+      
+      return(fcast)
       
 }
 
@@ -81,7 +113,13 @@ census_forecast <- function(startdate_id,
 
 # test the function: ------
 census_fcast <- census_forecast("20181201", 
-                                "20190501", 
+                                "20181207", 
                                 n_unit = "LGH 6E")
 
 str(census_fcast)
+tail(census_fcast)
+
+census_fcast %>% 
+      ggplot(aes(x = ds, 
+                 y = yhat)) + 
+      geom_line()
