@@ -65,9 +65,9 @@ census_forecast <- function(startdate_id,
                                 ymd(startdate_id)) %>% 
             as.integer() + 1
       
-      print(list(historical_start, 
-                 historical_end, 
-                 horizon_param))
+      # print(list(historical_start, 
+      #            historical_end, 
+      #            horizon_param))
       
       
       # pull historical data from denodo, using extract_census( ) function: 
@@ -95,16 +95,32 @@ census_forecast <- function(startdate_id,
       future <- make_future_dataframe(m, 
                                       periods = horizon_param,
                                       freq = "day")  # 20 years, in months
-      print(future)
+      # print(future)
       
       fcast <- predict(m, future) %>% 
             select(ds, 
                    yhat_lower, 
                    yhat, 
-                   yhat_upper)
+                   yhat_upper) %>% 
+            
+            # reformat result: 
+            mutate(date_id = map_int(ds, 
+                                     function(x){
+                                           x %>% as.character() %>% 
+                                                 str_replace_all("-", "") %>% 
+                                                 as.integer()
+                                     })) %>% 
+            select(date_id, ds, everything()) 
+            # select(-ds) # %>% 
+            # gather(key = "metric", 
+            #        value = "value", 
+            #        -date_id)
+      
+      # plot fcast: 
+      plot(m, predict(m, future))
       
       # plot components: 
-      prophet_plot_components(m, predict(m, future))
+      prophet_plot_components(m, predict(m, future)) 
       
       return(fcast)
       
@@ -114,12 +130,12 @@ census_forecast <- function(startdate_id,
 
 
 # test the function: ------
-census_fcast <- census_forecast("20181201", 
-                                "20181207", 
-                                n_unit = "LGH 6W")
+census_fcast <- census_forecast("20190215", 
+                                "20190219", 
+                                n_unit = "LGH 4W")
 
-str(census_fcast)
-tail(census_fcast)
+# str(census_fcast)
+tail(census_fcast, 10)  # %>% write.table(file = "clipboard", sep = "\t", row.names = FALSE)
 
 census_fcast %>% 
       ggplot(aes(x = ds, 
