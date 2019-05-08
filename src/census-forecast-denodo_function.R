@@ -103,6 +103,8 @@ census_forecast <- function(startdate_id,
                    yhat, 
                    yhat_upper)
       
+      # plot components: 
+      prophet_plot_components(m, predict(m, future))
       
       return(fcast)
       
@@ -114,7 +116,7 @@ census_forecast <- function(startdate_id,
 # test the function: ------
 census_fcast <- census_forecast("20181201", 
                                 "20181207", 
-                                n_unit = "LGH 6E")
+                                n_unit = "LGH 6W")
 
 str(census_fcast)
 tail(census_fcast)
@@ -122,4 +124,10 @@ tail(census_fcast)
 census_fcast %>% 
       ggplot(aes(x = ds, 
                  y = yhat)) + 
-      geom_line()
+      geom_ribbon(data = slice(census_fcast, 1098:1104), 
+                  aes(x = ds, 
+                      ymin = yhat_lower, 
+                      ymax = yhat_upper), 
+                  fill = "blue") +
+      geom_line() 
+      
