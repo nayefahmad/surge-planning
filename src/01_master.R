@@ -17,7 +17,7 @@ library(here)
 
 # 1) parameters: --------------
 startdate_id <- '20180517'
-enddate_id <- '20180521'
+enddate_id <- '20180522'
 
 n_units_param <- c("LGH 2E",
                    "LGH 3E", 
@@ -39,6 +39,8 @@ n_units_param <- c("LGH 2E",
 # 2) set up database connections: -----------
 source(here("src", 
             "setup-denodo_function.R"))
+
+setup_denodo()
 
 
 # 3) Import functions for pulling data: ---------
@@ -93,5 +95,5 @@ df1.past_year_data <-
 write_csv(df1.past_year_data,
           here::here("results", 
                          "output from src", 
-                         "2019-05-07_lgh_historical-admits-transfers-ed-visits.csv"))
+                         "2019-05-08_lgh_historical-admits-transfers-ed-visits.csv"))
                          
