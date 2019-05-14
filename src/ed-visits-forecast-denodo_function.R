@@ -15,7 +15,6 @@ edvisits_forecast <- function(startdate_id,
                               enddate_id, 
                               past_years = 3,  # todo: change to 5?  
                               site = "Lions Gate Hospital", 
-                              n_unit, 
                               holidays_df, 
                               fcast_only = TRUE, 
                               changepoints_vec = NULL, 
@@ -81,16 +80,15 @@ edvisits_forecast <- function(startdate_id,
   
   
   # pull historical data from denodo, using extract_census( ) function: 
-  census <- extract_census(historical_start_id, 
-                           historical_end_id, 
-                           n_units = n_unit) %>% 
+  edvisits <- extract_ed_visits(historical_start_id, 
+                                historical_end_id) %>% 
     ungroup() %>%  # convert from grouped_df to df
     right_join(full_date_list)
   
   
   
   # set up data for prophet:  
-  census <- census %>% 
+  edvisits <- edvisits %>% 
     select(date, 
            value) %>% 
     rename(ds = date, 
@@ -100,7 +98,7 @@ edvisits_forecast <- function(startdate_id,
   # fit prophet model: ------------------------------
   library(prophet)
   
-  m <- prophet(census, 
+  m <- prophet(edvisits, 
                holidays = holidays_df, 
                changepoints = changepoints_vec, 
                changepoint.prior.scale = trend_flexibility)
@@ -128,15 +126,12 @@ edvisits_forecast <- function(startdate_id,
     
     # return historical pull as well as fcast? 
     {if (fcast_only) {filter(., date_id >= startdate_id)
-    } else {.}}
+      } else {.}}
   
   # save forecast and plot components
   plot_fitted <- plot(m, fcast)
   plot_components <- prophet_plot_components(m, fcast)
   
-  # print forecast and plot components: 
-  print(plot(m, fcast))
-  print(prophet_plot_components(m, fcast))
   
   if (save_plots) {
     return(list(fcast_modified, 
@@ -153,51 +148,42 @@ edvisits_forecast <- function(startdate_id,
 
 
 # test the function: ------
-# startdate_id <- "20190401"
-# enddate_id <- "20190512"
+# startdate_id <- "20190501"
+# enddate_id <- "20190513"
 # 
-# census_actual <- extract_census(startdate_id,
-#                                 enddate_id,
-#                                 n_units = "LGH 2E")
+# edvisits_actual <- extract_ed_visits(startdate_id,
+#                                      enddate_id)
 # 
 # 
-# census_fcast <- census_forecast(startdate_id,  
-#                                 enddate_id, 
-#                                 n_unit = "LGH 2E", 
-#                                 changepoints_vec = c("2018-04-01", 
-#                                                      "2019-02-01", 
-#                                                      "2019-02-02"), 
-#                                 trend_flexibility = 0.05, 
-#                                 save_plots = FALSE, 
-#                                 holidays_df = holidays)
+# edvisits_fcast <- edvisits_forecast(startdate_id,
+#                                     enddate_id,
+#                                     trend_flexibility = 0.05,
+#                                     save_plots = FALSE,
+#                                     holidays_df = holidays)
 
-# str(census_fcast)
-
-# census_fcast_tail <- 
-#       census_fcast %>% 
-#       filter(date_id >= startdate_id) #  %>% write.table(file = "clipboard", sep = "\t", row.names = FALSE)
+# str(edvisits_fcast)
 
 
 # plot comparing actual with forecast: 
-# census_fcast %>% 
-#       ggplot(aes(x = ds, 
-#                  y = yhat)) + 
-#       geom_ribbon(aes(x = ds, 
-#                       ymin = yhat_lower, 
-#                       ymax = yhat_upper), 
-#                   fill = "grey80", 
+# edvisits_fcast %>%
+#       ggplot(aes(x = ds,
+#                  y = yhat)) +
+#       geom_ribbon(aes(x = ds,
+#                       ymin = yhat_lower,
+#                       ymax = yhat_upper),
+#                   fill = "grey80",
 #                   alpha = 0.5) +
-#       geom_line(col = "skyblue") + 
-#       geom_point(col = "skyblue") + 
-#       
-#       geom_line(data = census_actual %>% 
-#                       bind_cols(census_fcast %>% select(ds)), 
-#                 aes(x = ds, 
-#                     y = value), 
-#                 col = "blue") + 
-#       
+#       geom_line(col = "skyblue") +
+#       geom_point(col = "skyblue") +
+# 
+#       geom_line(data = edvisits_actual %>%
+#                       bind_cols(edvisits_fcast %>% select(ds)),
+#                 aes(x = ds,
+#                     y = value),
+#                 col = "blue") +
+# 
 #       theme_light() +
-#       theme(panel.grid.minor = element_line(colour = "grey95"), 
+#       theme(panel.grid.minor = element_line(colour = "grey95"),
 #               panel.grid.major = element_line(colour = "grey95"))
 
 
