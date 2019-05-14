@@ -112,6 +112,10 @@ edvisits_forecast <- function(startdate_id,
            yhat, 
            yhat_upper) %>% 
     
+    rename(edvisits_lower_ci = yhat_lower, 
+           edvisits_fcast = yhat, 
+           edvisits_upper_ci = yhat_upper) %>% 
+    
     # reformat result: 
     mutate(date_id = map_int(ds, 
                              function(x){

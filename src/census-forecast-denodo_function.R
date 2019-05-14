@@ -119,6 +119,10 @@ census_forecast <- function(startdate_id,
                    yhat, 
                    yhat_upper) %>% 
             
+            rename(census_lower_ci = yhat_lower, 
+                   census_fcast = yhat, 
+                   census_upper_ci = yhat_upper) %>% 
+            
             # reformat result: 
             mutate(date_id = map_int(ds, 
                                      function(x){
