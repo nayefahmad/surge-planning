@@ -141,6 +141,11 @@ census_forecast <- function(startdate_id,
 startdate_id <- "20181201"
 enddate_id <- "20190105"
 
+census_actual <- extract_census(startdate_id, 
+                                enddate_id, 
+                                n_units = "LGH 4W")
+
+
 census_fcast <- census_forecast(startdate_id,  
                                 enddate_id, 
                                 n_unit = "LGH 4W", 
@@ -160,7 +165,14 @@ census_fcast %>%
                       ymax = yhat_upper), 
                   fill = "grey80", 
                   alpha = 0.5) +
-      geom_line() + 
+      geom_line(col = "skyblue") + 
+      
+      geom_line(data = census_actual %>% 
+                      bind_cols(census_fcast %>% select(ds)), 
+                aes(x = ds, 
+                    y = value), 
+                col = "blue") + 
+      
       theme_light() +
       theme(panel.grid.minor = element_line(colour = "grey95"), 
               panel.grid.major = element_line(colour = "grey95"))
