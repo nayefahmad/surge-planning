@@ -40,7 +40,9 @@ extract_admits <- function(startdate_id,
     # display in long format: 
     gather(key = "metric",
            value = "value", 
-           -c(date_id, nursing_unit_cd))
+           -c(date_id, nursing_unit_cd)) %>% 
+            
+      ungroup
   
   
 }
