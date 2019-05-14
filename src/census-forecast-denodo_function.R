@@ -19,12 +19,14 @@ census_forecast <- function(startdate_id,
                             site = "Lions Gate Hospital", 
                             n_unit, 
                             holidays_df, 
+                            fcast_only = TRUE, 
                             denodo_vw = vw_census){
       
       # inputs: 
       # > start and end date_id: the date range for which to return forecast
       # > past_years: how many years historical data to pull for fitting the trend 
       # > n_unit: the nursing unit to forecast census for 
+      # > fcast_only: if TRUE, return only the fcast, not the historical data pulled as well
       
       # outputs: 
       # > dataframe with columns: date_id, nursing_unit_cd, metric, value
@@ -118,7 +120,12 @@ census_forecast <- function(startdate_id,
                                                  str_replace_all("-", "") %>% 
                                                  as.integer()
                                      })) %>% 
-            select(date_id, ds, everything()) 
+            select(date_id, ds, everything()) %>% 
+            
+            # return historical pull as well as fcast? 
+            {if (fcast_only) {filter(., date_id >= startdate_id)
+                  } else {.}}
+            
 
       # plot components: 
       prophet_plot_components(m, predict(m, future)) 
@@ -131,21 +138,31 @@ census_forecast <- function(startdate_id,
 
 
 # test the function: ------
-census_fcast <- census_forecast("20180517", 
-                                "20180522", 
+startdate_id <- "20181201"
+enddate_id <- "20190105"
+
+census_fcast <- census_forecast(startdate_id,  
+                                enddate_id, 
                                 n_unit = "LGH 4W", 
                                 holidays_df = holidays)
 
 # str(census_fcast)
-tail(census_fcast, 10)  %>% write.table(file = "clipboard", sep = "\t", row.names = FALSE)
+
+# census_fcast_tail <- 
+#       census_fcast %>% 
+#       filter(date_id >= startdate_id) #  %>% write.table(file = "clipboard", sep = "\t", row.names = FALSE)
 
 census_fcast %>% 
       ggplot(aes(x = ds, 
                  y = yhat)) + 
-      geom_ribbon(data = slice(census_fcast, 1098:1104), 
-                  aes(x = ds, 
+      geom_ribbon(aes(x = ds, 
                       ymin = yhat_lower, 
                       ymax = yhat_upper), 
-                  fill = "blue") +
-      geom_line() 
+                  fill = "grey80", 
+                  alpha = 0.5) +
+      geom_line() + 
+      theme_light() +
+      theme(panel.grid.minor = element_line(colour = "grey95"), 
+              panel.grid.major = element_line(colour = "grey95"))
+              
       
