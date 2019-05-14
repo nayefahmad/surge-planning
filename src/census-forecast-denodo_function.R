@@ -18,7 +18,7 @@ census_forecast <- function(startdate_id,
                             past_years = 3,  # todo: change to 5?  
                             site = "Lions Gate Hospital", 
                             n_unit, 
-                            holidays_df, 
+                            holidays_df = NULL, 
                             fcast_only = TRUE, 
                             changepoints_vec = NULL, 
                             trend_flexibility = 0.05,  # default set by prophet

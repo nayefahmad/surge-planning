@@ -15,7 +15,7 @@ edvisits_forecast <- function(startdate_id,
                               enddate_id, 
                               past_years = 3,  # todo: change to 5?  
                               site = "Lions Gate Hospital", 
-                              holidays_df, 
+                              holidays_df = NULL, 
                               fcast_only = TRUE, 
                               changepoints_vec = NULL, 
                               trend_flexibility = 0.05,  # default set by prophet
@@ -34,9 +34,6 @@ edvisits_forecast <- function(startdate_id,
   
   library(lubridate)
   library(stringr)
-  
-  # check wheter holidays dataframe has been specified: 
-  # stopifnot(exists(holidays_df))
   
   
   # historical data range: --------
