@@ -96,7 +96,7 @@ census_forecast <- function(startdate_id,
                    y = value)
       
       
-      # fit prophet model: 
+      # fit prophet model: ------------------------------
       library(prophet)
       
       m <- prophet(census, 
@@ -126,9 +126,11 @@ census_forecast <- function(startdate_id,
             {if (fcast_only) {filter(., date_id >= startdate_id)
                   } else {.}}
             
+      # print forecast: 
+      print(plot(m, predict(m, future)))
 
       # plot components: 
-      prophet_plot_components(m, predict(m, future)) 
+      print(prophet_plot_components(m, predict(m, future)))
       
       return(fcast)
       
@@ -138,17 +140,17 @@ census_forecast <- function(startdate_id,
 
 
 # test the function: ------
-startdate_id <- "20181201"
-enddate_id <- "20190105"
+startdate_id <- "20180101"
+enddate_id <- "20180512"
 
 census_actual <- extract_census(startdate_id, 
                                 enddate_id, 
-                                n_units = "LGH 4W")
+                                n_units = "LGH 6W")
 
 
 census_fcast <- census_forecast(startdate_id,  
                                 enddate_id, 
-                                n_unit = "LGH 4W", 
+                                n_unit = "LGH 6W", 
                                 holidays_df = holidays)
 
 # str(census_fcast)
@@ -157,6 +159,8 @@ census_fcast <- census_forecast(startdate_id,
 #       census_fcast %>% 
 #       filter(date_id >= startdate_id) #  %>% write.table(file = "clipboard", sep = "\t", row.names = FALSE)
 
+
+# plot comparing actual with forecast: 
 census_fcast %>% 
       ggplot(aes(x = ds, 
                  y = yhat)) + 
@@ -166,6 +170,7 @@ census_fcast %>%
                   fill = "grey80", 
                   alpha = 0.5) +
       geom_line(col = "skyblue") + 
+      geom_point(col = "skyblue") + 
       
       geom_line(data = census_actual %>% 
                       bind_cols(census_fcast %>% select(ds)), 
