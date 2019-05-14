@@ -20,6 +20,8 @@ census_forecast <- function(startdate_id,
                             n_unit, 
                             holidays_df, 
                             fcast_only = TRUE, 
+                            changepoints_vec = NULL, 
+                            trend_flexibility = 0.05,  # default set by prophet
                             denodo_vw = vw_census){
       
       # inputs: 
@@ -100,12 +102,13 @@ census_forecast <- function(startdate_id,
       library(prophet)
       
       m <- prophet(census, 
-                   holidays = holidays_df)
+                   holidays = holidays_df, 
+                   changepoints = changepoints_vec, 
+                   changepoint.prior.scale = trend_flexibility)
       
       future <- make_future_dataframe(m, 
                                       periods = horizon_param,
-                                      freq = "day")  # 20 years, in months
-      # print(future)
+                                      freq = "day")  
       
       fcast <- predict(m, future)  # to be used for plotting below
             
@@ -142,17 +145,19 @@ census_forecast <- function(startdate_id,
 
 
 # test the function: ------
-startdate_id <- "20180101"
-enddate_id <- "20180512"
+startdate_id <- "20160101"
+enddate_id <- "20190512"
 
-census_actual <- extract_census(startdate_id, 
-                                enddate_id, 
-                                n_units = "LGH 6W")
+census_actual <- extract_census(startdate_id,
+                                enddate_id,
+                                n_units = "LGH 2E")
 
 
 census_fcast <- census_forecast(startdate_id,  
                                 enddate_id, 
-                                n_unit = "LGH 6W", 
+                                n_unit = "LGH 2E", 
+                                changepoints_vec = c("2017-01-01"), 
+                                trend_flexibility = 0.5, 
                                 holidays_df = holidays)
 
 # str(census_fcast)
