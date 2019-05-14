@@ -4,9 +4,13 @@
 # Function to produce census forecast for given date range 
 #*****************************************************
 
-# library(lubridate)
-# library(stringr)
-# library(tidyverse)
+# import df with holidays specified: 
+options(readr.default_locale=readr::locale(tz="America/Los_Angeles"))
+
+holidays <- read_csv(here::here("data", 
+                                "2019-05-13_holidays-data-frame.csv"))
+
+
 
 # function definition: 
 census_forecast <- function(startdate_id, 
@@ -14,6 +18,7 @@ census_forecast <- function(startdate_id,
                             past_years = 3,  # todo: change to 5?  
                             site = "Lions Gate Hospital", 
                             n_unit, 
+                            holidays_df, 
                             denodo_vw = vw_census){
       
       # inputs: 
@@ -25,9 +30,11 @@ census_forecast <- function(startdate_id,
       # > dataframe with columns: date_id, nursing_unit_cd, metric, value
       # > levels of "metric" field: predicted, prediction_lower, prediction_upper
       
+      library(lubridate)
+      library(stringr)
 
-      # check whether function to pull census from denodo has been loaded: 
-      stopifnot(exists("extract_census"))
+      # check wheter holidays dataframe has been specified: 
+      # stopifnot(exists(holidays_df))
       
       
       # historical data range: --------
@@ -90,7 +97,8 @@ census_forecast <- function(startdate_id,
       # fit prophet model: 
       library(prophet)
       
-      m <- prophet(census)
+      m <- prophet(census, 
+                   holidays = holidays_df)
       
       future <- make_future_dataframe(m, 
                                       periods = horizon_param,
@@ -111,14 +119,7 @@ census_forecast <- function(startdate_id,
                                                  as.integer()
                                      })) %>% 
             select(date_id, ds, everything()) 
-            # select(-ds) # %>% 
-            # gather(key = "metric", 
-            #        value = "value", 
-            #        -date_id)
-      
-      # plot fcast: 
-      plot(m, predict(m, future))
-      
+
       # plot components: 
       prophet_plot_components(m, predict(m, future)) 
       
@@ -130,12 +131,13 @@ census_forecast <- function(startdate_id,
 
 
 # test the function: ------
-census_fcast <- census_forecast("20190215", 
-                                "20190219", 
-                                n_unit = "LGH 4W")
+census_fcast <- census_forecast("20180517", 
+                                "20180522", 
+                                n_unit = "LGH 4W", 
+                                holidays_df = holidays)
 
 # str(census_fcast)
-tail(census_fcast, 10)  # %>% write.table(file = "clipboard", sep = "\t", row.names = FALSE)
+tail(census_fcast, 10)  %>% write.table(file = "clipboard", sep = "\t", row.names = FALSE)
 
 census_fcast %>% 
       ggplot(aes(x = ds, 
