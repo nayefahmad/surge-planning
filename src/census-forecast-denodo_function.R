@@ -22,6 +22,7 @@ census_forecast <- function(startdate_id,
                             fcast_only = TRUE, 
                             changepoints_vec = NULL, 
                             trend_flexibility = 0.05,  # default set by prophet
+                            save_plots = FALSE, 
                             denodo_vw = vw_census){
       
       # inputs: 
@@ -131,13 +132,22 @@ census_forecast <- function(startdate_id,
             {if (fcast_only) {filter(., date_id >= startdate_id)
                   } else {.}}
             
-      # print forecast: 
+      # save forecast and plot components
+      plot_fitted <- plot(m, fcast)
+      plot_components <- prophet_plot_components(m, fcast)
+      
+      # print forecast and plot components: 
       print(plot(m, fcast))
-
-      # plot components: 
       print(prophet_plot_components(m, fcast))
       
-      return(fcast_modified)
+      if (save_plots) {
+            return(list(fcast_modified, 
+                        plot_fitted, 
+                        plot_components))
+      } else {
+            return(fcast_modified)
+      }
+      
       
 }
 
@@ -145,7 +155,7 @@ census_forecast <- function(startdate_id,
 
 
 # test the function: ------
-startdate_id <- "20160101"
+startdate_id <- "20190401"
 enddate_id <- "20190512"
 
 census_actual <- extract_census(startdate_id,
@@ -156,8 +166,11 @@ census_actual <- extract_census(startdate_id,
 census_fcast <- census_forecast(startdate_id,  
                                 enddate_id, 
                                 n_unit = "LGH 2E", 
-                                changepoints_vec = c("2017-01-01"), 
-                                trend_flexibility = 0.5, 
+                                changepoints_vec = c("2018-04-01", 
+                                                     "2019-02-01", 
+                                                     "2019-02-02"), 
+                                trend_flexibility = 0.05, 
+                                save_plots = FALSE, 
                                 holidays_df = holidays)
 
 # str(census_fcast)
