@@ -107,7 +107,9 @@ census_forecast <- function(startdate_id,
                                       freq = "day")  # 20 years, in months
       # print(future)
       
-      fcast <- predict(m, future) %>% 
+      fcast <- predict(m, future)  # to be used for plotting below
+            
+      fcast_modified <- fcast %>%  # to be returned by the function
             select(ds, 
                    yhat_lower, 
                    yhat, 
@@ -127,12 +129,12 @@ census_forecast <- function(startdate_id,
                   } else {.}}
             
       # print forecast: 
-      print(plot(m, predict(m, future)))
+      print(plot(m, fcast))
 
       # plot components: 
-      print(prophet_plot_components(m, predict(m, future)))
+      print(prophet_plot_components(m, fcast))
       
-      return(fcast)
+      return(fcast_modified)
       
 }
 
