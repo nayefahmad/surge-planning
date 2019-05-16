@@ -1,0 +1,42 @@
+---
+title: "LGH Daily ED visits forecast"
+author: "Nayef Ahmad"
+date: "May 16, 2019"
+output: 
+    html_document: 
+        toc: true
+        code_folding: show
+        toc_depth: 4
+        toc_float: 
+            collapsed: false
+        self_contained: no
+editor_options: 
+  chunk_output_type: console
+fontsize: 14
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+knitr::opts_chunk$set(echo = TRUE, 
+                      warning = FALSE, 
+                      message = FALSE)
+
+library(knitr)
+library(kableExtra)
+library(odbc)
+library(dbplyr)
+library(magrittr)  
+library(tidyverse)
+library(here)
+
+# shortcuts: 
+# > ctrl + alt + i ==> new code chunk
+# > ctrl + shift + k ==> knit doc 
+# \  ==> line break (include 2 spaces after)
+
+```
+
+
+
+
