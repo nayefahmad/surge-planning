@@ -61,12 +61,15 @@ source(here("src",
 
 ```
 
+\  
+\  
+\  
 
 # Set forecast dates: 
 
 ```{r}
-startdate_id <- "20190501"
-enddate_id <- "20190507" 
+startdate_id <- "20190401"
+enddate_id <- "20190430" 
 
 data.frame(parameter = c("Beginning of fcast interval", 
                          "End of fcast interval"), 
@@ -82,8 +85,9 @@ data.frame(parameter = c("Beginning of fcast interval",
 
 ```
 
-
-
+\  
+\  
+\  
 
 # Components of the model: 
 ```{r}
@@ -99,13 +103,18 @@ edvisits_actual <- extract_ed_visits(startdate_id,
 
 ```
 
+\  
+\  
+\  
 
 # Historical data and fitted model: 
 ```{r}
 edvisits_fcast[[2]]
 ```
 
-
+\  
+\  
+\  
 
 # Run forecast: 
 ```{r}
@@ -113,7 +122,8 @@ edvisits_fcast[[1]] %>%
       kable() %>% 
       kable_styling(bootstrap_options = c("striped",
                                           "condensed", 
-                                          "responsive"))
+                                          "responsive")) %>% 
+      scroll_box(width = "100%", height = "400px")
 ```
 
 \  
