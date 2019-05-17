@@ -5,7 +5,7 @@ date: "May 16, 2019"
 output: 
     html_document: 
         toc: true
-        code_folding: show
+        code_folding: hide
         toc_depth: 4
         toc_float: 
             collapsed: false
@@ -38,47 +38,41 @@ library(here)
 
 ```
 
-## Setup connections to denodo: 
+## Setup connection to database: 
 
 ```{r}
+# Setup connections to denodo and import functions
+
 source(here("src", 
             "setup-denodo_function.R"))
 
 setup_denodo()
 
 
-```
-
-
-## Functions to pull ED data, and to forecast future ED visits: 
-```{r}
+# Functions to pull ED data, and to forecast future ED visits:
 source(here("src", 
             "ed-visits-denodo_function.R"))
 source(here("src", 
             "ed-visits-forecast-denodo_function.R"))
 
+
+
+
+
 ```
+
 
 ## Set forecast dates: 
 
 ```{r}
 startdate_id <- "20190501"
 enddate_id <- "20190507" 
-```
 
-
-
-
-## Run forecast: 
-```{r}
-edvisits_fcast <- edvisits_forecast(startdate_id,
-                                    enddate_id,
-                                    trend_flexibility = 0.05,
-                                    save_plots = FALSE,
-                                    holidays_df = holidays)
-
-
-edvisits_fcast %>% 
+data.frame(parameter = c("Beginning of fcast interval", 
+                         "End of fcast interval"), 
+           date = c(startdate_id, 
+                    enddate_id)) %>% 
+      
       kable() %>% 
       kable_styling(bootstrap_options = c("striped",
                                           "condensed", 
@@ -89,4 +83,28 @@ edvisits_fcast %>%
 ```
 
 
+
+
+## Fit historical data: 
+```{r}
+edvisits_fcast <- edvisits_forecast(startdate_id,
+                                    enddate_id,
+                                    trend_flexibility = 0.05,
+                                    save_plots = TRUE,
+                                    holidays_df = holidays)
+
+
+edvisits_fcast[[2]]
+
+```
+
+
+## Run forecast: 
+```{r}
+edvisits_fcast[[1]] %>% 
+      kable() %>% 
+      kable_styling(bootstrap_options = c("striped",
+                                          "condensed", 
+                                          "responsive"))
+```
 
