@@ -12,7 +12,7 @@ output:
         self_contained: no
 editor_options: 
   chunk_output_type: console
-fontsize: 14
+fontsize: 12
 ---
 
 ```{r setup, include=FALSE}
@@ -38,7 +38,7 @@ library(here)
 
 ```
 
-## Setup connection to database: 
+# Setup connection to database: 
 
 ```{r}
 # Setup connections to denodo and import functions
@@ -62,7 +62,7 @@ source(here("src",
 ```
 
 
-## Set forecast dates: 
+# Set forecast dates: 
 
 ```{r}
 startdate_id <- "20190501"
@@ -85,7 +85,7 @@ data.frame(parameter = c("Beginning of fcast interval",
 
 
 
-## Fit historical data: 
+# Components of the model: 
 ```{r}
 edvisits_fcast <- edvisits_forecast(startdate_id,
                                     enddate_id,
@@ -93,13 +93,21 @@ edvisits_fcast <- edvisits_forecast(startdate_id,
                                     save_plots = TRUE,
                                     holidays_df = holidays)
 
+edvisits_actual <- extract_ed_visits(startdate_id,
+                                     enddate_id)
 
-edvisits_fcast[[2]]
 
 ```
 
 
-## Run forecast: 
+# Historical data and fitted model: 
+```{r}
+edvisits_fcast[[2]]
+```
+
+
+
+# Run forecast: 
 ```{r}
 edvisits_fcast[[1]] %>% 
       kable() %>% 
@@ -107,4 +115,41 @@ edvisits_fcast[[1]] %>%
                                           "condensed", 
                                           "responsive"))
 ```
+
+\  
+\  
+\  
+
+# Validating forecast with actual data: 
+Note that the cross-validated MAPE of the model for 1-week horizon forecasts is about 8%. MAE is about 15. 
+
+
+```{r}
+# plot comparing actual with forecast: 
+edvisits_fcast_df <- edvisits_fcast[[1]]
+
+edvisits_fcast_df %>%
+      ggplot(aes(x = ds,
+                 y = edvisits_fcast)) +
+      geom_ribbon(aes(x = ds,
+                      ymin = edvisits_lower_ci,
+                      ymax = edvisits_upper_ci),
+                  fill = "grey80",
+                  alpha = 0.5) +
+      geom_line(col = "skyblue") +
+      geom_point(col = "skyblue") +
+
+      geom_line(data = edvisits_actual %>%
+                      bind_cols(edvisits_fcast_df %>% select(ds)),
+                aes(x = ds,
+                    y = value),
+                col = "blue") +
+
+      theme_light() +
+      theme(panel.grid.minor = element_line(colour = "grey95"),
+              panel.grid.major = element_line(colour = "grey95"))
+
+```
+
+
 
