@@ -24,6 +24,7 @@ knitr::opts_chunk$set(echo = TRUE,
 
 library(knitr)
 library(kableExtra)
+
 library(odbc)
 library(dbplyr)
 library(magrittr)  
@@ -37,6 +38,55 @@ library(here)
 
 ```
 
+## Setup connections to denodo: 
+
+```{r}
+source(here("src", 
+            "setup-denodo_function.R"))
+
+setup_denodo()
+
+
+```
+
+
+## Functions to pull ED data, and to forecast future ED visits: 
+```{r}
+source(here("src", 
+            "ed-visits-denodo_function.R"))
+source(here("src", 
+            "ed-visits-forecast-denodo_function.R"))
+
+```
+
+## Set forecast dates: 
+
+```{r}
+startdate_id <- "20190501"
+enddate_id <- "20190507" 
+```
+
+
+
+
+## Run forecast: 
+```{r}
+edvisits_fcast <- edvisits_forecast(startdate_id,
+                                    enddate_id,
+                                    trend_flexibility = 0.05,
+                                    save_plots = FALSE,
+                                    holidays_df = holidays)
+
+
+edvisits_fcast %>% 
+      kable() %>% 
+      kable_styling(bootstrap_options = c("striped",
+                                          "condensed", 
+                                          "responsive"))
+                                          
+
+
+```
 
 
 
