@@ -94,6 +94,7 @@ data.frame(parameter = c("Beginning of fcast interval",
 edvisits_fcast <- edvisits_forecast(startdate_id,
                                     enddate_id,
                                     trend_flexibility = 0.05,
+                                    past_years = 5, 
                                     save_plots = TRUE,
                                     holidays_df = holidays)
 
