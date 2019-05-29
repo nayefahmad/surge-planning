@@ -141,7 +141,8 @@ edvisits_forecast <- function(startdate_id,
   if (save_plots) {
     return(list(fcast_modified, 
                 plot_fitted, 
-                plot_components))
+                plot_components, 
+                fcast))
   } else {
     return(fcast_modified)
   }
@@ -153,18 +154,18 @@ edvisits_forecast <- function(startdate_id,
 
 
 # test the function: ------
-# startdate_id <- "20190501"
-# enddate_id <- "20190527"
-# 
-# edvisits_actual <- extract_ed_visits(startdate_id,
-#                                      enddate_id)
-# 
-# 
-# edvisits_fcast <- edvisits_forecast(startdate_id,
-#                                     enddate_id,
-#                                     trend_flexibility = 0.05,
-#                                     save_plots = FALSE,
-#                                     holidays_df = holidays)
+startdate_id <- "20190501"
+enddate_id <- "20190527"
+
+edvisits_actual <- extract_ed_visits(startdate_id,
+                                     enddate_id)
+
+
+edvisits_fcast <- edvisits_forecast(startdate_id,
+                                    enddate_id,
+                                    trend_flexibility = 0.05,
+                                    save_plots = TRUE,
+                                    holidays_df = holidays)
 
 # str(edvisits_fcast)
 
