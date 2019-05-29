@@ -67,9 +67,9 @@ source(here("src",
 
 # Set forecast dates: 
 
-```{r}
-startdate_id <- "20190401"
-enddate_id <- "20190430" 
+```{r params}
+startdate_id <- "20190501"
+enddate_id <- "20190527" 
 
 data.frame(parameter = c("Beginning of fcast interval", 
                          "End of fcast interval"), 
@@ -90,7 +90,7 @@ data.frame(parameter = c("Beginning of fcast interval",
 \  
 
 # Components of the model: 
-```{r}
+```{r fcast-and-actuals}
 edvisits_fcast <- edvisits_forecast(startdate_id,
                                     enddate_id,
                                     trend_flexibility = 0.05,
