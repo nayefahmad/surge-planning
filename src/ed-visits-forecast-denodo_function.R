@@ -2,11 +2,15 @@
 # Function to produce ED visit forecast for given date range 
 #*****************************************************
 
+library(lubridate)
+
 # import df with holidays specified: 
 options(readr.default_locale=readr::locale(tz="America/Los_Angeles"))
 
-holidays <- read_csv(here::here("data", 
-                                "2019-05-13_holidays-data-frame.csv"))
+holidays <- 
+  read_csv(here::here("data", 
+                      "2019-05-13_holidays-data-frame.csv")) %>% 
+  mutate(ds = mdy(ds))
 
 
 
@@ -150,7 +154,7 @@ edvisits_forecast <- function(startdate_id,
 
 # test the function: ------
 # startdate_id <- "20190501"
-# enddate_id <- "20190513"
+# enddate_id <- "20190527"
 # 
 # edvisits_actual <- extract_ed_visits(startdate_id,
 #                                      enddate_id)
@@ -168,10 +172,10 @@ edvisits_forecast <- function(startdate_id,
 # plot comparing actual with forecast: 
 # edvisits_fcast %>%
 #       ggplot(aes(x = ds,
-#                  y = yhat)) +
+#                  y = edvisits_fcast)) +
 #       geom_ribbon(aes(x = ds,
-#                       ymin = yhat_lower,
-#                       ymax = yhat_upper),
+#                       ymin = edvisits_lower_ci,
+#                       ymax = edvisits_upper_ci),
 #                   fill = "grey80",
 #                   alpha = 0.5) +
 #       geom_line(col = "skyblue") +
