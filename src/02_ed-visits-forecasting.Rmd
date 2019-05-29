@@ -30,6 +30,7 @@ library(dbplyr)
 library(magrittr)  
 library(tidyverse)
 library(here)
+library(DT)
 
 # shortcuts: 
 # > ctrl + alt + i ==> new code chunk
@@ -117,15 +118,19 @@ edvisits_fcast[[2]]
 \  
 \  
 
-# Run forecast: 
-```{r}
-edvisits_fcast[[1]] %>% 
-      kable() %>% 
-      kable_styling(bootstrap_options = c("striped",
-                                          "condensed", 
-                                          "responsive")) %>% 
-      scroll_box(width = "100%", height = "400px")
+# Forecast results: 
+```{r display-downloadable-table}
+edvisits_fcast[[1]] %>%
+  DT::datatable(extensions = 'Buttons', 
+                options = list(dom = 'Bfrtip', 
+                   buttons = c('excel', "csv"))) %>% 
+  formatRound(c("edvisits_fcast", 
+                "edvisits_lower_ci", 
+                "edvisits_upper_ci"), 
+              1)
+  
 ```
+
 
 \  
 \  
