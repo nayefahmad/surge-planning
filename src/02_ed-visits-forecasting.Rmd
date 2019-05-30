@@ -41,20 +41,20 @@ library(DT)
 
 # Setup connection to database: 
 
-```{r}
+```{r denodo-setup}
 # Setup connections to denodo and import functions
 
-source(here("src", 
-            "setup-denodo_function.R"))
+source(here::here("src",
+                  "setup-denodo_function.R"))
 
 setup_denodo()
 
 
 # Functions to pull ED data, and to forecast future ED visits:
-source(here("src", 
-            "ed-visits-denodo_function.R"))
-source(here("src", 
-            "ed-visits-forecast-denodo_function.R"))
+source(here::here("src", 
+                  "ed-visits-denodo_function.R"))
+source(here::here("src", 
+                  "ed-visits-forecast-denodo_function.R"))
 
 
 
@@ -69,8 +69,8 @@ source(here("src",
 # Set forecast dates: 
 
 ```{r params}
-startdate_id <- "20190501"
-enddate_id <- "20190527" 
+startdate_id <- "20180501"
+enddate_id <- "20190131" 
 
 data.frame(parameter = c("Beginning of fcast interval", 
                          "End of fcast interval"), 

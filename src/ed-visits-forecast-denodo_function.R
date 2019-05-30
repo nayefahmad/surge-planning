@@ -111,7 +111,11 @@ edvisits_forecast <- function(startdate_id,
   fcast <- predict(m, future)  # to be used for plotting below
   
   fcast_modified <- fcast %>%  # to be returned by the function
+    
+    mutate(day = weekdays(ds)) %>% 
+    
     select(ds, 
+           day, 
            yhat_lower, 
            yhat, 
            yhat_upper) %>% 
@@ -127,7 +131,7 @@ edvisits_forecast <- function(startdate_id,
                                  str_replace_all("-", "") %>% 
                                  as.integer()
                              })) %>% 
-    select(date_id, ds, everything()) %>% 
+    select(date_id, ds, day, everything()) %>% 
     
     # return historical pull as well as fcast? 
     {if (fcast_only) {filter(., date_id >= startdate_id)
@@ -154,18 +158,18 @@ edvisits_forecast <- function(startdate_id,
 
 
 # test the function: ------
-startdate_id <- "20190501"
-enddate_id <- "20190527"
-
-edvisits_actual <- extract_ed_visits(startdate_id,
-                                     enddate_id)
-
-
-edvisits_fcast <- edvisits_forecast(startdate_id,
-                                    enddate_id,
-                                    trend_flexibility = 0.05,
-                                    save_plots = TRUE,
-                                    holidays_df = holidays)
+# startdate_id <- "20190501"
+# enddate_id <- "20190527"
+# 
+# edvisits_actual <- extract_ed_visits(startdate_id,
+#                                      enddate_id)
+# 
+# 
+# edvisits_fcast <- edvisits_forecast(startdate_id,
+#                                     enddate_id,
+#                                     trend_flexibility = 0.05,
+#                                     save_plots = TRUE,
+#                                     holidays_df = holidays)
 
 # str(edvisits_fcast)
 
