@@ -158,8 +158,8 @@ edvisits_forecast <- function(startdate_id,
 
 
 # test the function: ------
-# startdate_id <- "20190501"
-# enddate_id <- "20190527"
+# startdate_id <- "20180628"
+# enddate_id <- "20190702"
 # 
 # edvisits_actual <- extract_ed_visits(startdate_id,
 #                                      enddate_id)

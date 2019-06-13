@@ -16,11 +16,11 @@ library(here)
 # rm(list = ls())
 
 # 1) parameters: --------------
-startdate_id <- '20180517'
-enddate_id <- '20180522'
+startdate_id <- '20180629'
+enddate_id <- '20180703'
 
-startdate_id_for_fcast <- "20190517"
-enddate_id_for_fcast <- "20190522"
+startdate_id_for_fcast <- "20190628"
+enddate_id_for_fcast <- "20190702"
 
 
 n_units_param <- c("LGH 2E",
@@ -41,18 +41,18 @@ n_units_param <- c("LGH 2E",
 
 
 # 2) set up database connections: -----------
-source(here("src", 
-            "setup-denodo_function.R"))
+source(here::here("src", 
+                  "setup-denodo_function.R"))
 
 setup_denodo()
 
 
 # 3) Import functions for pulling data: ---------
-source(here("src", 
+source(here::here("src", 
             "census-denodo_function.R"))
-source(here("src", 
+source(here::here("src", 
             "ed-visits-denodo_function.R"))
-source(here("src", 
+source(here::here("src", 
             "admits-denodo_function.R"))
 
 
@@ -97,7 +97,10 @@ holidays <- read_csv(here::here("data",
 # run forecast: 
 edvisits_fcast <- edvisits_forecast(startdate_id_for_fcast, 
                                     enddate_id_for_fcast ,
-                                    holidays_df = holidays) %>% 
+                                    holidays_df = holidays) 
+
+edvisits_fcast <- edvisits_fcast[[1]] %>% 
+      as.data.frame() %>% 
       
       # reformat to match other results: 
       gather(key = "metric", 
@@ -131,5 +134,5 @@ df1.surge_planning_data <-
 write_csv(df1.surge_planning_data,
           here::here("results", 
                          "output from src", 
-                         "2019-05-14_lgh_surge-planning-data.csv"))
+                         "2019-06-12_lgh_surge-planning-data.csv"))
                          
