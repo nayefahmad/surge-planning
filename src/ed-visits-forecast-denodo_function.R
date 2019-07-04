@@ -17,7 +17,7 @@ holidays <-
 # function definition: 
 edvisits_forecast <- function(startdate_id, 
                               enddate_id, 
-                              past_years = 3,  # todo: change to 5?  
+                              past_years = 5,  # todo: change this?  
                               site = "Lions Gate Hospital", 
                               holidays_df = NULL, 
                               fcast_only = TRUE, 
@@ -29,8 +29,11 @@ edvisits_forecast <- function(startdate_id,
   # inputs: 
   # > start and end date_id: the date range for which to return forecast
   # > past_years: how many years historical data to pull for fitting the trend 
-  # > n_unit: the nursing unit to forecast census for 
   # > fcast_only: if TRUE, return only the fcast, not the historical data pulled as well
+  # > holidays_df: name of df with holidays identified (both historical and in fcast horizon)
+  # > changepointe_vec: any date(s) to specify as changepoints? 
+  # > save_plots: if FALSE, only return df of fcast; else, return plots, fitted model object, etc.
+            
   
   # outputs: 
   # > dataframe with columns: date_id, nursing_unit_cd, metric, value
@@ -56,7 +59,7 @@ edvisits_forecast <- function(startdate_id,
     str_replace_all("-", "")
   
   
-  # full date list to join on, in case dates missing in census: 
+  # full date list to join on, in case dates missing in historical data: 
   full_date_list <- 
     data.frame(date = seq(historical_start, 
                           historical_end, 
@@ -80,7 +83,7 @@ edvisits_forecast <- function(startdate_id,
   #            horizon_param))
   
   
-  # pull historical data from denodo, using extract_census( ) function: 
+  # pull historical data from denodo, using appropriate "extract_" function: 
   edvisits <- extract_ed_visits(historical_start_id, 
                                 historical_end_id) %>% 
     ungroup() %>%  # convert from grouped_df to df
@@ -146,7 +149,8 @@ edvisits_forecast <- function(startdate_id,
     return(list(fcast_modified, 
                 plot_fitted, 
                 plot_components, 
-                fcast))
+                fcast, 
+                m))
   } else {
     return(fcast_modified)
   }
@@ -157,24 +161,27 @@ edvisits_forecast <- function(startdate_id,
 
 
 
-# test the function: ------
-# startdate_id <- "20180628"
-# enddate_id <- "20190702"
+# test the function: ------------------------------
+
+# to set up connections to denodo and import functions, use the file 
+# `02_ed-visits-forecasting.Rmd` in this folder 
+
+# startdate_id <- "20190623"
+# enddate_id <- "20190703"
 # 
 # edvisits_actual <- extract_ed_visits(startdate_id,
 #                                      enddate_id)
 # 
-# 
 # edvisits_fcast <- edvisits_forecast(startdate_id,
 #                                     enddate_id,
 #                                     trend_flexibility = 0.05,
-#                                     save_plots = TRUE,
+#                                     save_plots = TRUE,  # TODO: set to TRUE inspect model
 #                                     holidays_df = holidays)
-
-# str(edvisits_fcast)
-
-
-# plot comparing actual with forecast: 
+# 
+# str(edvisits_fcast, max.level = 1)
+# # str(edvisits_fcast[[4]])  # view prophet model (if save_plots = TRUE)
+# 
+# # plot comparing actual with forecast: 
 # edvisits_fcast %>%
 #       ggplot(aes(x = ds,
 #                  y = edvisits_fcast)) +
@@ -195,5 +202,5 @@ edvisits_forecast <- function(startdate_id,
 #       theme_light() +
 #       theme(panel.grid.minor = element_line(colour = "grey95"),
 #               panel.grid.major = element_line(colour = "grey95"))
-
-
+# 
+# 
