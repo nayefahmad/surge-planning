@@ -51,9 +51,9 @@ setup_denodo()
 
 
 # Functions to pull ED data, and to forecast future ED visits:
-source(here::here("src", 
+source(here::here("src",
                   "ed-visits-denodo_function.R"))
-source(here::here("src", 
+source(here::here("src",
                   "ed-visits-forecast-denodo_function.R"))
 
 
@@ -131,13 +131,56 @@ edvisits_fcast[[1]] %>%
   
 ```
 
+\  
+\  
+\  
+
+# Cross validation 
+Results for 24 day forecast horizon: 
+
+* Cross-validated RMSE is **13.3 visits**. 
+* Cross-validated MAE is **10.5 visits**. 
+* Cross-validated MAPE is **0.060** or **6.0%**. 
+
+```{r cross-validate, eval=FALSE}
+
+# Warning: this will take a very long time to run
+
+m <- edvisits_fcast[[5]]
+
+# dataframe of predictions from multiple rounds of CV: 
+df.cv <- cross_validation(m, 
+                          initial = 825, 
+                          horizon = 7,
+                          units = "days")
+
+# Making 285 forecasts with cutoffs between 2016-09-23 and 2019-06-14
+
+write_csv(df.cv,
+          here::here("results", 
+                     "output from src", 
+                     "2019-07-04_cross-validate-prophet-model.csv"))
+                         
+
+# performance metrics 
+df.performance <- performance_metrics(df.cv)
+
+write_csv(df.performance,
+          here::here("results", 
+                     "output from src", 
+                     "2019-07-04_performance-metrics-for-prophet-model.csv"))
+
+
+```
+
+
 
 \  
 \  
 \  
 
 # Validating forecast with actual data: 
-Note that the cross-validated MAPE of the model for 1-week horizon forecasts is about 8%. MAE is about 15. 
+
 
 
 ```{r}
