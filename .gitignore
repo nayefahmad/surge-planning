@@ -1,0 +1,15 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.js
+*.css
+*.png
+*.woff
+*.ttf
+data/2018-06-15_lgh_sick-call-data-updated.xlsx
+*.xlsx
+
+results/
+data/
+docs/
