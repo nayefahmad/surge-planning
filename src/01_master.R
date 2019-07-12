@@ -16,11 +16,11 @@ library(here)
 # rm(list = ls())
 
 # 1) parameters: --------------
-startdate_id <- '20180629'
-enddate_id <- '20180703'
+startdate_id <- '20180803'
+enddate_id <- '20180807'
 
-startdate_id_for_fcast <- "20190628"
-enddate_id_for_fcast <- "20190702"
+startdate_id_for_fcast <- "20190802"
+enddate_id_for_fcast <- "20190806"
 
 
 n_units_param <- c("LGH 2E",
@@ -60,7 +60,8 @@ source(here::here("src",
 
 # LGH data: 
 census <- extract_census(startdate_id, 
-                         enddate_id)
+                         enddate_id, 
+                         n_units = n_units_param)
 
 ed_visits <- extract_ed_visits(startdate_id, 
                                enddate_id)
@@ -134,5 +135,5 @@ df1.surge_planning_data <-
 write_csv(df1.surge_planning_data,
           here::here("results", 
                          "output from src", 
-                         "2019-06-12_lgh_surge-planning-data.csv"))
+                         "2019-07-12_lgh_surge-planning-data.csv"))
                          

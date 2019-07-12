@@ -22,24 +22,24 @@ extract_census <- function(startdate_id,
             filter(facility_name == !!(site),  # !! used to unquote the actual argument "site" 
                    census_date_id >= startdate_id, 
                    census_date_id <= enddate_id, 
-                   nursing_unit_cd %in% n_units) %>% 
+                   nursing_unit_short_desc_at_census %in% n_units) %>% 
             
             select(census_date_id, 
                    patient_id, 
-                   nursing_unit_cd, 
+                   nursing_unit_short_desc_at_census, 
                    facility_name) %>%  # show_query()
             
             collect() %>% 
              
             group_by(census_date_id, 
-                     nursing_unit_cd) %>%
+                     nursing_unit_short_desc_at_census) %>%
             summarise(census = n()) %>% 
             rename(date_id = census_date_id) %>% 
             
             # display in long format: 
             gather(key = "metric",
                    value = "value", 
-                   -c(date_id, nursing_unit_cd)) %>% 
+                   -c(date_id, nursing_unit_short_desc_at_census)) %>% 
             ungroup
       
       
@@ -50,6 +50,6 @@ extract_census <- function(startdate_id,
 
 # test the function: ------
 # library(beepr)
-# 
-# census <- extract_census("20181212", 
-#                          "20181213"); beep()
+
+census <- extract_census("20181212",
+                         "20181213") 
