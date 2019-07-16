@@ -16,8 +16,8 @@ library(here)
 # rm(list = ls())
 
 # 1) parameters: --------------
-startdate_id <- '20180803'
-enddate_id <- '20180807'
+startdate_id <- "20180803"
+enddate_id <- "20180807"
 
 startdate_id_for_fcast <- "20190802"
 enddate_id_for_fcast <- "20190806"
@@ -93,7 +93,8 @@ source(here::here("src",
 # Import holidays dataframe: 
 options(readr.default_locale=readr::locale(tz="America/Los_Angeles"))
 holidays <- read_csv(here::here("data", 
-                                "2019-05-13_holidays-data-frame.csv"))
+                                "2019-05-13_holidays-data-frame.csv")) %>% 
+      mutate(ds = mdy(ds))
 
 # run forecast: 
 edvisits_fcast <- edvisits_forecast(startdate_id_for_fcast, 
@@ -134,6 +135,6 @@ df1.surge_planning_data <-
 # 7) write output: -----------
 write_csv(df1.surge_planning_data,
           here::here("results", 
-                         "output from src", 
-                         "2019-07-12_lgh_surge-planning-data.csv"))
+                     "output from src", 
+                     "2019-07-16_lgh_surge-planning-data.csv"))
                          
