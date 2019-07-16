@@ -22,20 +22,20 @@ extract_admits <- function(startdate_id,
     filter(facility_name == !!(site),  # !! used to unquote the actual argument "site" 
            admission_date_id >= startdate_id, 
            admission_date_id <= enddate_id, 
-           nursing_unit_cd_at_admit %in% n_units) %>% 
+           nursing_unit_short_desc_at_admit %in% n_units) %>% 
     
     select(admission_date_id, 
            patient_id, 
-           nursing_unit_cd_at_admit, 
+           nursing_unit_short_desc_at_admit, 
            facility_name) %>%  # show_query()
     
     collect() %>% 
     
     group_by(admission_date_id, 
-             nursing_unit_cd_at_admit) %>%
+             nursing_unit_short_desc_at_admit) %>%
     summarise(admits = n()) %>% 
     rename(date_id = admission_date_id, 
-           nursing_unit_cd = nursing_unit_cd_at_admit) %>% 
+           nursing_unit_cd = nursing_unit_short_desc_at_admit) %>% 
     
     # display in long format: 
     gather(key = "metric",
@@ -53,8 +53,8 @@ extract_admits <- function(startdate_id,
 # test the function: ------
 # library(beepr)
 # 
-# admits <- extract_admits("20180209", 
-#                          "20180214"); beep()
+# admits <- extract_admits("20180209",
+#                          "20180214"); # beep()
 # 
 # admits2 <- extract_admits("20190101", 
 #                           "20190501"); beep()

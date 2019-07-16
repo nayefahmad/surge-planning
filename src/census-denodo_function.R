@@ -40,7 +40,9 @@ extract_census <- function(startdate_id,
             gather(key = "metric",
                    value = "value", 
                    -c(date_id, nursing_unit_short_desc_at_census)) %>% 
-            ungroup
+            ungroup %>% 
+            
+            rename(nursing_unit_cd = nursing_unit_short_desc_at_census)
       
       
 }
@@ -51,5 +53,5 @@ extract_census <- function(startdate_id,
 # test the function: ------
 # library(beepr)
 
-census <- extract_census("20181212",
-                         "20181213") 
+# census <- extract_census("20180803",
+#                          "20180807") 

@@ -124,9 +124,7 @@ df1.surge_planning_data <-
       bind_rows(census_hope_centre, 
                 admits, 
                 admits_hope_centre, 
-                ed_visits, 
-                edvisits_fcast)  
-
+                ed_visits)  
 
 
 
@@ -134,7 +132,12 @@ df1.surge_planning_data <-
 
 # 7) write output: -----------
 write_csv(df1.surge_planning_data,
-          here::here("results", 
-                     "output from src", 
+          here::here("results",
+                     "output from src",
                      "2019-07-16_lgh_surge-planning-data.csv"))
+                         
+write_csv(edvisits_fcast,
+          here::here("results",
+                     "output from src",
+                     "2019-07-16_lgh_ed-visits-fcast.csv"))
                          
