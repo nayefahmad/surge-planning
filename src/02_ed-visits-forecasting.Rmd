@@ -69,8 +69,8 @@ source(here::here("src",
 # Set forecast dates: 
 
 ```{r params}
-startdate_id <- "20190622"
-enddate_id <- "20190703" 
+startdate_id <- "20180803"
+enddate_id <- "20180807" 
 
 data.frame(parameter = c("Beginning of fcast interval", 
                          "End of fcast interval"), 

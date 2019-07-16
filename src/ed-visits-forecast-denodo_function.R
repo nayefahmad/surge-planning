@@ -50,12 +50,12 @@ edvisits_forecast <- function(startdate_id,
   # start and end as date_ids: 
   historical_start_id <- 
     historical_start %>% 
-    as.character( ) %>% 
+    as.character(.) %>% 
     str_replace_all("-", "")
   
   historical_end_id <- 
     historical_end %>% 
-    as.character( ) %>% 
+    as.character(.) %>% 
     str_replace_all("-", "")
   
   
