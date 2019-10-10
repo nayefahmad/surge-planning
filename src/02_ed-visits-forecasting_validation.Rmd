@@ -203,7 +203,13 @@ edvisits_fcast_df %>%
                       bind_cols(edvisits_fcast_df %>% select(ds)),
                 aes(x = ds,
                     y = value),
-                col = "blue") +
+                col = "black" ,
+                alpha = 0.5) +
+      
+      labs(title = "LGH ED - Validating forecast of daily ED visits", 
+           subtitle = sprintf("%s to %s", 
+                              startdate_id, 
+                              enddate_id)) + 
 
       theme_light() +
       theme(panel.grid.minor = element_line(colour = "grey95"),
