@@ -10,6 +10,7 @@ output:
         toc_float: 
             collapsed: false
         self_contained: no
+        keep_md: yes
 editor_options: 
   chunk_output_type: console
 fontsize: 12
@@ -71,6 +72,9 @@ source(here::here("src",
 ```{r params}
 startdate_id <- "20191010"
 enddate_id <- "20200103" 
+
+start_date <- ymd(startdate_id)
+end_date <- ymd(enddate_id)
 
 data.frame(parameter = c("Beginning of fcast interval", 
                          "End of fcast interval"), 
@@ -179,10 +183,10 @@ edvisits_fcast_df %>%
       #           col = "black" ,
       #           alpha = 0.5) +
       
-      labs(title = "LGH ED - Validating forecast of daily ED visits", 
+      labs(title = "LGH ED - Forecast of daily ED visits", 
            subtitle = sprintf("%s to %s \nGrey area represents 95 percent prediction interval", 
-                              startdate_id, 
-                              enddate_id)) + 
+                              start_date, 
+                              end_date)) + 
 
       theme_light() +
       theme(panel.grid.minor = element_line(colour = "grey95"),
@@ -226,13 +230,45 @@ edvisits_fcast[[4]] %>%
   theme_light() + 
   
   labs(title = "LGH ED - Estimates of holiday effects over forecast interval", 
-           subtitle = sprintf("%s to %s", 
-                              startdate_id, 
-                              enddate_id)) + 
+        subtitle = sprintf("%s to %s",
+                           start_date, 
+                           end_date), 
+       x = "Date", 
+       y = "Number of additional ED visits") + 
 
   theme(panel.grid.minor = element_line(colour = "grey95"), 
         panel.grid.major = element_line(colour = "grey95"))
               
+
+
+```
+
+
+\  
+\  
+\  
+
+# Appendix 
+
+```{r}
+
+# write outputs 
+
+# write_csv(edvisits_fcast_df,
+#           here::here("results", 
+#                      "output from src",
+#                      "2019-10-09_lgh_ED-daily-visits-forecast.csv"))
+#                          
+# write_csv(edvisits_fcast[[4]] %>% 
+#                 select(ds,
+#                        holidays) %>% 
+#                 filter(ds > ymd(startdate_id)),
+#           
+#           here::here("results", 
+#                      "output from src",
+#                      "2019-10-09_lgh_ED-daily-visits-forecast_impacts-of-holidays.csv"))
+
+
 
 
 ```
