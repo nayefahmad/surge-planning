@@ -1,7 +1,7 @@
 ---
 title: "LGH Daily ED visits forecast"
 author: "Nayef Ahmad"
-date: "May 16, 2019"
+date: "2019-10-09"
 output: 
     html_document: 
         toc: true
@@ -69,8 +69,8 @@ source(here::here("src",
 # Set forecast dates: 
 
 ```{r params}
-startdate_id <- "20190901"
-enddate_id <- "20191007" 
+startdate_id <- "20191010"
+enddate_id <- "20200103" 
 
 data.frame(parameter = c("Beginning of fcast interval", 
                          "End of fcast interval"), 
@@ -99,8 +99,9 @@ edvisits_fcast <- edvisits_forecast(startdate_id,
                                     save_plots = TRUE,
                                     holidays_df = holidays)
 
-edvisits_actual <- extract_ed_visits(startdate_id,
-                                     enddate_id)
+# No need to pull historical data (it doesn't exist for this interval)
+# edvisits_actual <- extract_ed_visits(startdate_id,
+#                                      enddate_id)
 
 
 ```
@@ -135,43 +136,15 @@ edvisits_fcast[[1]] %>%
 \  
 \  
 
-# Cross validation 
-Results for 24 day forecast horizon: 
+# Forecast accuracy
+In preliminary validation, we got the following results for 24-day forecast horizon: 
 
 * Cross-validated RMSE is **13.3 visits**. 
 * Cross-validated MAE is **10.5 visits**. 
 * Cross-validated MAPE is **0.060** or **6.0%**. 
 
-```{r cross-validate, eval=FALSE}
+Note that these forecasts are likely to be lower for longer horizons. 
 
-# Warning: this will take a very long time to run
-
-m <- edvisits_fcast[[5]]
-
-# dataframe of predictions from multiple rounds of CV: 
-df.cv <- cross_validation(m, 
-                          initial = 825, 
-                          horizon = 7,
-                          units = "days")
-
-# Making 285 forecasts with cutoffs between 2016-09-23 and 2019-06-14
-
-write_csv(df.cv,
-          here::here("results", 
-                     "output from src", 
-                     "2019-07-04_cross-validate-prophet-model.csv"))
-                         
-
-# performance metrics 
-df.performance <- performance_metrics(df.cv)
-
-write_csv(df.performance,
-          here::here("results", 
-                     "output from src", 
-                     "2019-07-04_performance-metrics-for-prophet-model.csv"))
-
-
-```
 
 
 
@@ -179,7 +152,7 @@ write_csv(df.performance,
 \  
 \  
 
-# Validating forecast with actual data: 
+# Forecast plot 
 
 
 
@@ -196,24 +169,24 @@ edvisits_fcast_df %>%
                       ymax = edvisits_upper_ci),
                   fill = "grey80",
                   alpha = 0.5) +
-      geom_line(col = "skyblue") +
-      geom_point(col = "skyblue") +
+      geom_line(col = "black") +
+      geom_point(col = "black") +
 
-      geom_line(data = edvisits_actual %>% 
-                      bind_cols(edvisits_fcast_df %>% select(ds)),
-                aes(x = ds,
-                    y = value),
-                col = "black" ,
-                alpha = 0.5) +
+      # geom_line(data = edvisits_actual %>% 
+      #                 bind_cols(edvisits_fcast_df %>% select(ds)),
+      #           aes(x = ds,
+      #               y = value),
+      #           col = "black" ,
+      #           alpha = 0.5) +
       
       labs(title = "LGH ED - Validating forecast of daily ED visits", 
-           subtitle = sprintf("%s to %s", 
+           subtitle = sprintf("%s to %s \nGrey area represents 95 percent prediction interval", 
                               startdate_id, 
                               enddate_id)) + 
 
       theme_light() +
       theme(panel.grid.minor = element_line(colour = "grey95"),
-              panel.grid.major = element_line(colour = "grey95"))
+            panel.grid.major = element_line(colour = "grey95"))
 
 ```
 
@@ -221,16 +194,12 @@ edvisits_fcast_df %>%
 
 # Holiday effects: 
 
-```{r}
-edvisits_fcast[[3]][[2]]
-```
-
-\  
 
 ```{r}
 edvisits_fcast[[4]] %>% 
   select(ds,
          holidays) %>% 
+  filter(ds > ymd(startdate_id)) %>% 
   
   DT::datatable(extensions = 'Buttons', 
                 options = list(dom = 'Bfrtip', 
@@ -241,4 +210,30 @@ edvisits_fcast[[4]] %>%
 ```
 
 \  
+
+```{r}
+edvisits_fcast[[4]] %>% 
+  select(ds,
+         holidays) %>% 
+  filter(ds > ymd(startdate_id)) %>% 
+      
+  ggplot(aes(x = ds, 
+             y = holidays)) + 
+  geom_line() + 
+  geom_point() + 
+  geom_hline(yintercept = 0, 
+             col = "blue") + 
+  theme_light() + 
+  
+  labs(title = "LGH ED - Estimates of holiday effects over forecast interval", 
+           subtitle = sprintf("%s to %s", 
+                              startdate_id, 
+                              enddate_id)) + 
+
+  theme(panel.grid.minor = element_line(colour = "grey95"), 
+        panel.grid.major = element_line(colour = "grey95"))
+              
+
+
+```
 
