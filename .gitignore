@@ -16,3 +16,4 @@ docs/
 src/02_ed-visits-forecasting_files
 src/02_ed-visits-forecasting_validation_files
 src/03_ed-visits-forecasting_files
+!src/03_ed-visits-forecasting_files/figure-html
